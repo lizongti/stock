@@ -16,43 +16,43 @@
         "fields": [
             {
                 "name": "time",
-                "type": "timestamp",
+                "type": "varchar",
                 "mapping": "time"
             },
             {
                 "name": "opening",
-                "type": "decimal(10,2)",
+                "type": "double",
                 "mapping": "opening"
             },
             {
                 "name": "closing",
-                "type": "decimal(10,2)",
-                "mapping": "opening"
+                "type": "double",
+                "mapping": "closing"
             },
             {
                 "name": "higheast",
-                "type": "decimal(10,2)",
-                "mapping": "opening"
+                "type": "double",
+                "mapping": "higheast"
             },
             {
                 "name": "loweast",
-                "type": "decimal(10,2)",
-                "mapping": "opening"
+                "type": "double",
+                "mapping": "loweast"
             },
             {
                 "name": "volume",
-                "type": "bigint",
-                "mapping": "opening"
+                "type": "double",
+                "mapping": "volume"
             },
             {
                 "name": "turnover",
-                "type": "bigint",
-                "mapping": "opening"
+                "type": "double",
+                "mapping": "turnover"
             },
             {
                 "name": "lastest",
-                "type": "decimal(10,2)",
-                "mapping": "opening"
+                "type": "double",
+                "mapping": "lastest"
             }
         ]
     }
