@@ -1,0 +1,59 @@
+{
+    "tableName": "minute",
+    "schemaName": "stock",
+    "key": {
+        "dataFormat": "raw",
+        "fields": [
+            {
+                "name": "key",
+                "type": "varchar",
+                "hidden": "false"
+            }
+        ]
+    },
+    "value": {
+        "dataFormat": "hash",
+        "fields": [
+            {
+                "name": "time",
+                "type": "timestamp",
+                "mapping": "time"
+            },
+            {
+                "name": "opening",
+                "type": "decimal(10,2)",
+                "mapping": "opening"
+            },
+            {
+                "name": "closing",
+                "type": "decimal(10,2)",
+                "mapping": "opening"
+            },
+            {
+                "name": "higheast",
+                "type": "decimal(10,2)",
+                "mapping": "opening"
+            },
+            {
+                "name": "loweast",
+                "type": "decimal(10,2)",
+                "mapping": "opening"
+            },
+            {
+                "name": "volume",
+                "type": "bigint",
+                "mapping": "opening"
+            },
+            {
+                "name": "turnover",
+                "type": "bigint",
+                "mapping": "opening"
+            },
+            {
+                "name": "lastest",
+                "type": "decimal(10,2)",
+                "mapping": "opening"
+            }
+        ]
+    }
+}
