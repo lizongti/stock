@@ -1,0 +1,29 @@
+{
+    "tableName": "minute",
+    "schemaName": "stock",
+    "key": {
+        "dataFormat": "raw",
+        "fields": [
+            {
+                "name": "key",
+                "type": "varchar",
+                "hidden": "false"
+            }
+        ]
+    },
+    "value": {
+        "dataFormat": "hash",
+        "fields": [
+            {
+                "name": "symbol",
+                "type": "varchar",
+                "mapping": "symbol"
+            },
+            {
+                "name": "name",
+                "type": "varchar",
+                "mapping": "name"
+            }
+        ]
+    }
+}
