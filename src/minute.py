@@ -12,8 +12,11 @@ keys = ["time", "opening", "closing", "higheast",
 def update():
     importer = presto.TableRowImporter(schema, table)
     symbols = stocks.get_symbols()
-    for symbol in symbols:
-        print("Symbol[%s]: minute is updating.." % (symbol), end='')
+    length = len(symbols)
+    for i in range(length):
+        symbol = symbols[i]
+        print("Symbol[%s](%d/%d): minute is updating.." %
+              (symbol, i+1, length), end='')
         __update_symbol(importer, symbol)
         print(" -> Done!")
 
