@@ -1,1 +1,1 @@
-docker run -d --rm --name stock stock
+docker run -itd --rm --network presto-network --name stock stock

@@ -2,7 +2,7 @@ import redis
 import json
 import os
 
-host = "localhost"
+host = "tendis"
 port = 51002
 password = "adminpass"
 db = 0
@@ -15,8 +15,8 @@ class TableRowImporter:
         self.conn = redis.Redis(
             host=host, port=port, password=password, db=db)
         self.fields = []
-        json_path = "%s\\presto\\tables\\%s.%s.json" % (
-            os.getcwd(), self.schema, self.table)
+        json_path = os.path.join(os.getcwd(), os.path.pardir, "presto", "tables", "%s.%s.json" % (
+            self.schema, self.table))
         with open(json_path) as f:
             data = json.loads(f.read())
             for field in data["value"]["fields"]:
