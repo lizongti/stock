@@ -1,5 +1,6 @@
 import akshare as ak
 import presto
+from retrying import retry
 
 schema = "stock"
 table = "stocks"
@@ -7,20 +8,22 @@ table = "stocks"
 
 def update():
     importer = presto.TableRowImporter(schema, table)
+    print("Stocks is updating..", end='')
+    __update_stocks(importer)
+    print(" -> Done!")
 
-    print("Stocks is updating...", end='')
 
+@retry
+def __update_stocks(importer: presto.TableRowImporter):
+    print(".", end='')
     df = ak.stock_info_a_code_name()
-
     for row in df.iterrows():
         values = row[1].values
         key = values[0]
         importer.save(key, values)
 
-    print("Done!")
 
-
-def get_symbols():
+def get_symbols() -> list:
     symbols = []
     df = ak.stock_info_a_code_name()
     for row in df.iterrows():
@@ -31,4 +34,5 @@ def get_symbols():
 
 
 if __name__ == '__main__':
+    print("Stocks is updating", end='')
     update()
