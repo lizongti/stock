@@ -1,5 +1,5 @@
 {
-    "tableName": "minute",
+    "tableName": "stocks",
     "schemaName": "stock",
     "key": {
         "dataFormat": "raw",
