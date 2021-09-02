@@ -13,7 +13,7 @@ def update():
     print(" -> Done!")
 
 
-@retry
+@retry(stop_max_attempt_number=100)
 def __update_stocks(importer: presto.TableRowImporter):
     print(".", end='')
     df = ak.stock_info_a_code_name()
