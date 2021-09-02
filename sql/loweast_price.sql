@@ -1,7 +1,5 @@
-select count(1) as count, m
+select count(*) as count, time
 from
-    (select day, m, loweast, row_number() over (partition by day order by loweast asc) num
-    from (select substr(time,1,10) as day, substr(time,12,5) as m, *
-        from minute))
+(select row_number() over (partition by symbol, date order by loweast asc) as num, time from minute)
 where num = 1
-group by m;
+group by time;
