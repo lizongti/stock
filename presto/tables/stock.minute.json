@@ -15,6 +15,16 @@
         "dataFormat": "hash",
         "fields": [
             {
+                "name": "symbol",
+                "type": "varchar",
+                "mapping": "symbol"
+            },
+            {
+                "name": "date",
+                "type": "varchar",
+                "mapping": "date"
+            },
+            {
                 "name": "time",
                 "type": "varchar",
                 "mapping": "time"
