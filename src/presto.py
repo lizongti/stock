@@ -20,11 +20,10 @@ class TableRowImporter:
     def __init__(self: object, schema: str, table: str):
         self.schema = schema
         self.table = table
-        self.conn = redis.Redis(
-            host=host, port=port, password=password, db=db)
+        self.conn = redis.Redis(host=host, port=port, password=password, db=db)
         self.fields = []
-        json_path = os.path.join(os.path.dirname(os.getcwd()), "presto", "tables", "%s.%s.json" % (
-            self.schema, self.table))
+        json_path = os.path.join(os.path.dirname(os.getcwd()), "presto", "tables",
+                                 "%s.%s.json" % (self.schema, self.table))
         with open(json_path) as f:
             data = json.loads(f.read())
             for field in data["value"]["fields"]:
@@ -34,4 +33,4 @@ class TableRowImporter:
         with self.conn.pipeline(transaction=False) as pipe:
             name = ":".join([self.schema, self.table, key])
             for i in range(0, len(self.fields)):
-                self.conn.hset(name, self.fields[i], values[i])
+                pipe.hset(name, self.fields[i], values[i])
