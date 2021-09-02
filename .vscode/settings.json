@@ -1,0 +1,7 @@
+{
+    "search.exclude": {},
+    "files.exclude": {
+        "**/.git": true,
+        "**/__pycache__": true,
+    }
+}
