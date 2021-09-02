@@ -21,7 +21,7 @@ def update():
         print(" -> Done!")
 
 
-# @retry
+@retry
 def __update_symbol(importer: presto.TableRowImporter, symbol: str):
     print(".", end='')
     df = ak.stock_zh_a_hist_min_em(symbol=symbol)

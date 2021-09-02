@@ -34,5 +34,4 @@ def get_symbols() -> list:
 
 
 if __name__ == '__main__':
-    print("Stocks is updating", end='')
     update()
