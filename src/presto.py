@@ -3,8 +3,8 @@ import redis
 import json
 import os
 
-host = "tendis"
-port = 51002
+host = "redis"
+port = 6379
 password = "adminpass"
 db = 0
 
