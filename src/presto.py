@@ -7,12 +7,12 @@ import platform
 if(platform.system() == 'Windows'):
     host = "127.0.0.1"
     port = 6379
-    password = ""
+    password = "adminpass"
     db = 7
 else:
     host = "pika"
     port = 6379
-    password = ""
+    password = "adminpass"
     db = 7
 
 
@@ -34,3 +34,4 @@ class TableRowImporter:
             name = ":".join([self.schema, self.table, key])
             for i in range(0, len(self.fields)):
                 pipe.hset(name, self.fields[i], values[i])
+            pipe.execute()

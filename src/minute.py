@@ -15,13 +15,13 @@ def update():
     length = len(symbols)
     for i in range(length):
         symbol = symbols[i]
-        print("Symbol[%s](%d/%d): minute is updating.." %
-              (symbol, i+1, length), end='')
+        print("Symbol[%s](%d/%d): minute is updating.."
+              %(symbol, i+1, length), end='')
         __update_symbol(importer, symbol)
         print(" -> Done!")
 
 
-# @retry(stop_max_attempt_number=100)
+@retry(stop_max_attempt_number=100)
 def __update_symbol(importer: presto.TableRowImporter, symbol: str):
     print(".", end='')
     df = ak.stock_zh_a_hist_min_em(symbol=symbol)
