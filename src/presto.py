@@ -2,11 +2,18 @@
 import redis
 import json
 import os
+import platform
 
-host = "redis"
-port = 6379
-password = "adminpass"
-db = 0
+if(platform.system() == 'Windows'):
+    host = "127.0.0.1"
+    port = 6379
+    password = ""
+    db = 7
+else:
+    host = "pika"
+    port = 6379
+    password = ""
+    db = 7
 
 
 class TableRowImporter:
