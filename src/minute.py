@@ -10,21 +10,22 @@ keys = ["time", "opening", "closing", "higheast",
 
 
 def update():
-    importer = presto.TableRowImporter(schema, table)
+    importer = presto.RedisRowsImporter(schema, table)
     symbols = stocks.get_symbols()
     length = len(symbols)
     for i in range(length):
         symbol = symbols[i]
         print("Symbol[%s](%d/%d): minute is updating.."
-              %(symbol, i+1, length), end='')
+              % (symbol, i+1, length), end='')
         __update_symbol(importer, symbol)
         print(" -> Done!")
 
 
 @retry(stop_max_attempt_number=100)
-def __update_symbol(importer: presto.TableRowImporter, symbol: str):
+def __update_symbol(importer: presto.RedisRowsImporter, symbol: str):
     print(".", end='')
     df = ak.stock_zh_a_hist_min_em(symbol=symbol)
+    rows = []
     for row in df.iterrows():
         minute = row[1].values[0]
         key = "%s:%s" % (symbol, minute.replace(
@@ -35,7 +36,8 @@ def __update_symbol(importer: presto.TableRowImporter, symbol: str):
 
         values = [symbol, date, time]
         values.extend(row[1].values[1:])
-        importer.save(key, values)
+        rows.append((key, values))
+    importer.save(rows)
 
 
 if __name__ == '__main__':
