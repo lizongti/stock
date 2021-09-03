@@ -8,7 +8,7 @@ if(platform.system() == 'Windows'):
     host = "127.0.0.1"
     port = 6379
     password = "adminpass"
-    db = 7
+    db = 6
 else:
     host = "pika"
     port = 6379
