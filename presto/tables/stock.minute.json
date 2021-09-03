@@ -60,9 +60,9 @@
                 "mapping": "turnover"
             },
             {
-                "name": "lastest",
+                "name": "latest",
                 "type": "double",
-                "mapping": "lastest"
+                "mapping": "latest"
             }
         ]
     }
