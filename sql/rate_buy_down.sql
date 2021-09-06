@@ -1,4 +1,4 @@
-select avg(b.closing/a.closing) as rate, b.time from
+select avg(b.closing/a.closing)-1 as rate, b.time from
 (select symbol, date, time, closing from minute) b inner join
 (
 select * from
