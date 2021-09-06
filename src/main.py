@@ -4,7 +4,7 @@ import traceback
 
 
 def main():
-    minute.update()
+    minute.update_redis()
 
 
 if __name__ == '__main__':

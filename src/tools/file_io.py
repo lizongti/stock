@@ -1,6 +1,16 @@
 import os
 
 
+def write_txt(name: str, rows: list[str]):
+    txt_path = os.path.join(os.path.dirname(os.getcwd()), "data", "txt",
+                            "%s.txt" % (name))
+    rows = []
+    with open(txt_path, 'r') as f:
+        lines = f.read().splitlines()
+        for line in lines:
+            rows.append(line.split("\t"))
+
+
 def read_txt(name: str):
     txt_path = os.path.join(os.path.dirname(os.getcwd()), "data", "txt",
                             "%s.txt" % (name))

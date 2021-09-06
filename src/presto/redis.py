@@ -16,7 +16,7 @@ else:
     db = 7
 
 
-class RedisRowsImporter:
+class RedisImporter:
     def __init__(self: object, schema: str, table: str):
         self.schema = schema
         self.table = table
