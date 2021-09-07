@@ -17,7 +17,7 @@
             {
                 "name": "key",
                 "type": "varchar",
-                "hidden": "key"
+                "mapping": "key"
             },
             {
                 "name": "code",
