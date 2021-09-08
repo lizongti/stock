@@ -5,9 +5,9 @@
         "dataFormat": "raw",
         "fields": [
             {
-                "name": "key",
+                "name": "hash_name",
                 "type": "varchar",
-                "hidden": "false"
+                "hidden": "true"
             }
         ]
     },
@@ -15,9 +15,19 @@
         "dataFormat": "hash",
         "fields": [
             {
+                "name": "key",
+                "type": "varchar",
+                "mapping": "key"
+            },
+            {
                 "name": "code",
                 "type": "varchar",
                 "mapping": "code"
+            },
+            {
+                "name": "name",
+                "type": "varchar",
+                "mapping": "name"
             }
         ]
     }

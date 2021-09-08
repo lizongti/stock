@@ -1,6 +1,4 @@
 import akshare as ak
-from presto.redis import RedisImporter
-from presto.hive import TxtImporter
 import stocks
 from retrying import retry
 
