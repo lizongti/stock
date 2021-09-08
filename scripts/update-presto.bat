@@ -6,4 +6,4 @@ docker run --rm ^
 -v hive_presto:/dst/presto ^
 centos:latest bash -c "cp -rf /src/presto/* /dst/presto/"
 
-docker service update hive_presto
+docker service update hive_presto --force
