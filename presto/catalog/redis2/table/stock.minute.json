@@ -1,0 +1,69 @@
+{
+    "tableName": "minute",
+    "schemaName": "stock",
+    "key": {
+        "dataFormat": "raw",
+        "fields": [
+            {
+                "name": "redis_key",
+                "type": "varchar",
+                "hidden": "true"
+            }
+        ]
+    },
+    "value": {
+        "dataFormat": "hash",
+        "fields": [
+            {
+                "name": "code",
+                "type": "varchar",
+                "mapping": "symbol"
+            },
+            {
+                "name": "date",
+                "type": "varchar",
+                "mapping": "date"
+            },
+            {
+                "name": "time",
+                "type": "varchar",
+                "mapping": "time"
+            },
+            {
+                "name": "opening",
+                "type": "double",
+                "mapping": "opening"
+            },
+            {
+                "name": "closing",
+                "type": "double",
+                "mapping": "closing"
+            },
+            {
+                "name": "higheast",
+                "type": "double",
+                "mapping": "higheast"
+            },
+            {
+                "name": "loweast",
+                "type": "double",
+                "mapping": "loweast"
+            },
+            {
+                "name": "volume",
+                "type": "double",
+                "mapping": "volume"
+            },
+            {
+                "name": "turnover",
+                "type": "double",
+                "mapping": "turnover"
+            },
+            {
+                "name": "latest",
+                "type": "double",
+                "mapping": "latest"
+            }
+        ]
+    }
+}
