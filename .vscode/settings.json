@@ -3,5 +3,8 @@
     "files.exclude": {
         "**/.git": true,
         "**/__pycache__": true,
+    },
+    "files.watcherExclude": {
+        "**/target": true
     }
 }
