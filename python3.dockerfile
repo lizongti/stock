@@ -3,8 +3,8 @@ FROM python:3.9.7
 COPY requirements.txt /
 RUN pip install -r requirements.txt
 
-ADD . /opt/stock
+ADD src /opt/stock
 
-WORKDIR /opt/stock/src
+WORKDIR /opt/stock
 
 ENTRYPOINT [ "python3", "main.py"]

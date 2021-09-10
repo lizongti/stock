@@ -67,6 +67,9 @@ class RedisImporter(Importer):
             self.port = 9221
         self.conn = redis.Redis(host=self.host, port=self.port)
 
+class HiveImporter(Importer):
+    _catalog
+
 
 def load(dataset: DataSet, data: object):
     ImporterFactory().produce(dataset.catalog).load(

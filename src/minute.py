@@ -47,5 +47,15 @@ def __update_symbol_minutes(importers: list[object], symbol: str):
         importer.save(pairs)
 
 
+# def get_symbols() -> list[str]:
+#     symbols = []
+#     df = ak.stock_info_a_code_name()
+#     for row in df.iterrows():
+#         values = row[1].values
+#         key = values[0]
+#         symbols.append(key)
+#     return symbols
+
+
 if __name__ == '__main__':
     update()
