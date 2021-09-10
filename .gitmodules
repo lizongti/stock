@@ -1,0 +1,3 @@
+[submodule "docker/stack"]
+	path = docker/stack
+	url = https://github.com/lizongti/docker-hive
