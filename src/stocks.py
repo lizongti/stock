@@ -20,7 +20,7 @@ class StocksDataSetUpdater(importer.DataSet):
         self._try_update()
         print(' -> Done!')
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _try_update(self: object):
         print('.', end='')
         df = ak.stock_info_a_code_name()

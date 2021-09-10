@@ -26,7 +26,7 @@ class MinutesDataSetUpdater(importer.DataSet):
             self._update_minutes(code)
             print(' -> Done!')
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _update_minutes(self: object, code: str):
         from datetime import date
 
@@ -42,7 +42,7 @@ class MinutesDataSetUpdater(importer.DataSet):
         importer.delete(self, {'code': code, 'date': dt})
         importer.insert(self, df)
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         symbols = []
         df = ak.stock_info_a_code_name()
