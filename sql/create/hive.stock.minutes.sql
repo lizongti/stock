@@ -1,4 +1,4 @@
-create table hive.default.minutes6(
+create table hive.stock.minutes(
   datetime varchar,
   opening double,
   closing double,

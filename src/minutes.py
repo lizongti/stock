@@ -5,10 +5,8 @@ from retrying import retry
 
 class MinutesDataSetUpdater(importer.DataSet):
     _catalog = 'hive'
-    # _schema = 'stock'
-    # _table = 'minutes'
-    _schema = 'default'
-    _table = 'minutes6'
+    _schema = 'stock'
+    _table = 'minutes'
     _columns = ["datetime", "opening", "closing", "higheast",
                 "loweast",  "volume", "turnover", "lastest"]
 
