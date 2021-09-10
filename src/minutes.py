@@ -38,7 +38,7 @@ class MinutesDataSetUpdater(importer.DataSet):
         df['code'] = df.apply(lambda x: code, axis=1)
 
         dt = date.today().strftime("%Y-%m-%d")
-        df.loc[df['date'] == dt]
+        df = df.loc[df['date'] == dt]
         importer.delete(self, {'code': code, 'date': dt})
         importer.insert(self, df)
 
