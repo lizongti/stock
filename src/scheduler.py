@@ -2,7 +2,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from stocks import StocksDataSourceUpdater
 from minutes import MinutesDataSourceUpdater
 
-_scheduler = BlockingScheduler()
+_scheduler = BlockingScheduler(timezone="Asia/Shanghai")
 
 
 def _daily():
