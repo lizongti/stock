@@ -7,7 +7,7 @@ RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
 
 ADD . /opt/stock
 
-ENV PYTHONUNBUFFERED 0
+ENV PYTHONUNBUFFERED 1
 
 WORKDIR /opt/stock
 
