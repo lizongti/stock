@@ -16,7 +16,7 @@ class DataSet(object):
                              self.table)
 
 
-class Importer(object):
+class Connector(object):
     def __init__(self: object, catalog: str):
         self.catalog = catalog
 
@@ -46,26 +46,23 @@ class Importer(object):
             self._default(schema, table, data)
 
 
-class ImporterFactory(object):
+class ConnectorFactory(object):
     def produce(self: object, case: str):
         return getattr(self, '_'+case, self._default)()
 
-    def _default(cls: object) -> Importer:
+    def _default(cls: object) -> Connector:
         return None
 
-    def _redis(cls: object) -> Importer:
+    def _redis(cls: object) -> Connector:
         return RedisImporter()
 
-    def _hive(cls: object) -> Importer:
-        return HiveImporter()
+    def _hive(cls: object) -> Connector:
+        return HiveConnector()
 
 
-class RedisImporter(Importer):
+class RedisImporter(Connector):
     _catalog = 'redis'
-    if(platform.system() == 'Windows'):
-        _host = '127.0.0.1'
-    else:
-        _host = 'pika'
+    _host = 'pika'
     _port = 9221
     _password = 'adminpass'
     _db = 0
@@ -98,16 +95,13 @@ class RedisImporter(Importer):
         pass
 
 
-class HiveImporter(Importer):
+class HiveConnector(Connector):
     _catalog = 'hive'
-    if(platform.system() == 'Windows'):
-        _host = '127.0.0.1'
-    else:
-        _host = 'presto'
+    _host = 'presto'
     _port = 8080
 
     def __init__(self: object):
-        super(HiveImporter, self).__init__(HiveImporter._catalog)
+        super(HiveConnector, self).__init__(HiveConnector._catalog)
 
     def __del__(self: object):
         pass
@@ -117,7 +111,7 @@ class HiveImporter(Importer):
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (HiveImporter._host, HiveImporter._port, schema))
+            (HiveConnector._host, HiveConnector._port, schema))
 
         df.to_sql(name=table, con=engine, if_exists='append',
                   index=False, index_label=None, chunksize=None,
@@ -130,7 +124,7 @@ class HiveImporter(Importer):
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (HiveImporter._host, HiveImporter._port, schema))
+            (HiveConnector._host, HiveConnector._port, schema))
         metadata = MetaData(bind=engine)
         user_table = Table(
             table, metadata, autoload=True, autoload_with=engine)
@@ -149,7 +143,7 @@ class HiveImporter(Importer):
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (HiveImporter._host, HiveImporter._port, schema))
+            (HiveConnector._host, HiveConnector._port, schema))
         metadata = MetaData(bind=engine)
         user_table = Table(
             table, metadata, autoload=True, autoload_with=engine)
@@ -164,10 +158,10 @@ class HiveImporter(Importer):
 
 
 def insert(dataset: DataSet, data: object):
-    ImporterFactory().produce(dataset.catalog).insert(
+    ConnectorFactory().produce(dataset.catalog).insert(
         dataset.schema, dataset.table, data)
 
 
 def delete(dataset: DataSet, data: object):
-    ImporterFactory().produce(dataset.catalog).delete(
+    ConnectorFactory().produce(dataset.catalog).delete(
         dataset.schema, dataset.table, data)
