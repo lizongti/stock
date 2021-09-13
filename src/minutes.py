@@ -1,3 +1,4 @@
+from pandas.core.frame import DataFrame
 import presto
 import akshare
 from retrying import retry
@@ -27,7 +28,7 @@ class MinutesDataUpdater(presto.DataSource):
             self._update_minutes(code, filter_today)
             print(' -> Done!')
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _update_minutes(self: object, code: str, filter_today):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
@@ -37,14 +38,13 @@ class MinutesDataUpdater(presto.DataSource):
         df['code'] = df.apply(lambda x: code, axis=1)
 
         if filter_today:
-            dt = date.today().strftime("%Y-%m-%d")
-            df = df.loc[df['date'] == dt]
-            presto.delete(self, {'code': code, 'date': dt})
-            presto.insert(self, df)
+            dts = [date.today().strftime("%Y-%m-%d")]
         else:
-            for dt in df['date'].unique():
-                presto.delete(self, {'code': code, 'date': dt})
-                presto.insert(self, df)
+            dts = df['date'].unique()
+
+        for dt in dts:
+            presto.delete(self, {'code': code, 'date': dt})
+            presto.insert(self, df.loc[df['date'] == dt])
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
