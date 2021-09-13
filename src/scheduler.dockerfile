@@ -2,8 +2,8 @@ FROM python:3.9.7
 
 COPY requirements.txt /
 RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
-    && ln -snf /usr/share/zoneinfo/Asia/shanghai /etc/localtime \
-    && echo Asia/shanghai > /etc/timezone
+    && ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo Asia/Shanghai > /etc/timezone
 
 ADD . /opt/stock
 
