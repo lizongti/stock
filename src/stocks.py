@@ -3,16 +3,16 @@ import akshare
 from retrying import retry
 
 
-class StocksDataSetUpdater(presto.DataSource):
+class StocksDataSourceUpdater(presto.DataSource):
     _catalog = 'redis'
     _schema = 'stock'
     _table = 'stocks'
 
     def __init__(self: object):
-        super(StocksDataSetUpdater, self).__init__(
-            StocksDataSetUpdater._catalog,
-            StocksDataSetUpdater._schema,
-            StocksDataSetUpdater._table)
+        super(StocksDataSourceUpdater, self).__init__(
+            StocksDataSourceUpdater._catalog,
+            StocksDataSourceUpdater._schema,
+            StocksDataSourceUpdater._table)
 
     def run(self: object):
         print('[%s]: updating..' % (self), end='')
@@ -28,4 +28,4 @@ class StocksDataSetUpdater(presto.DataSource):
 
 
 if __name__ == '__main__':
-    StocksDataSetUpdater().run()
+    StocksDataSourceUpdater().run()

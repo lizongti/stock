@@ -5,7 +5,7 @@ from retrying import retry
 from datetime import date
 
 
-class MinutesDataUpdater(presto.DataSource):
+class MinutesDataSourceUpdater(presto.DataSource):
     _catalog = 'hive'
     _schema = 'stock'
     _table = 'minutes'
@@ -13,10 +13,10 @@ class MinutesDataUpdater(presto.DataSource):
                 "loweast",  "volume", "turnover", "lastest"]
 
     def __init__(self: object):
-        super(MinutesDataUpdater, self).__init__(
-            MinutesDataUpdater._catalog,
-            MinutesDataUpdater._schema,
-            MinutesDataUpdater._table)
+        super(MinutesDataSourceUpdater, self).__init__(
+            MinutesDataSourceUpdater._catalog,
+            MinutesDataSourceUpdater._schema,
+            MinutesDataSourceUpdater._table)
 
     def run(self: object, filter_today=True):
         codes = self._get_codes()
@@ -32,7 +32,7 @@ class MinutesDataUpdater(presto.DataSource):
     def _update_minutes(self: object, code: str, filter_today):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
-        df.columns = MinutesDataUpdater._columns
+        df.columns = MinutesDataSourceUpdater._columns
         df['time'] = df.apply(lambda x: x['datetime'].split(' ')[1], axis=1)
         df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
         df['code'] = df.apply(lambda x: code, axis=1)
@@ -58,4 +58,4 @@ class MinutesDataUpdater(presto.DataSource):
 
 
 if __name__ == '__main__':
-    MinutesDataUpdater().run(False)
+    MinutesDataSourceUpdater().run(False)

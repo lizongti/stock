@@ -1,2 +1,2 @@
-if not exist "scripts" (cd ..)
+if not exist "" (cd ..)
 pipreqs ./ --force
