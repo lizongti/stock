@@ -7,4 +7,4 @@ ADD . /opt/stock
 
 WORKDIR /opt/stock
 
-ENTRYPOINT [ "python3", "schedule.py"]
+ENTRYPOINT [ "python3", "scheduler.py"]
