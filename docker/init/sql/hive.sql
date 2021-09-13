@@ -1,3 +1,4 @@
+create schema hive.stock;
 create table hive.stock.minutes(
   datetime varchar,
   opening double,
