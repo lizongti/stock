@@ -7,6 +7,8 @@ RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
 
 ADD . /opt/stock
 
+ENV PYTHONUNBUFFERED 0
+
 WORKDIR /opt/stock
 
 ENTRYPOINT [ "python3", "scheduler.py"]
