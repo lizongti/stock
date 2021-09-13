@@ -1,1 +1,1 @@
-docker swarm update --task-history-limit 2
+docker swarm update --task-history-limit 1

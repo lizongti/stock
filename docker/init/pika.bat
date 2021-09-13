@@ -4,7 +4,7 @@ if not exist "docker" (cd ..)
 docker run --rm ^
 --name pika-updater ^
 -v %cd%/docker/init/pika:/src ^
--v hive_pika-conf:/dst ^
+-v presto_pika-conf:/dst ^
 centos:latest bash -c "rm -rf /dst/* && cp -rf /src/* /dst/"
 
-docker service update hive_pika --force
+docker service update presto_pika --force
