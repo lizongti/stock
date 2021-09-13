@@ -11,5 +11,6 @@ def _daily():
 
 
 if __name__ == "__main__":
+    print("[scheduler] start!")
     _scheduler.add_job(_daily, 'cron', hour=22, minute=0)
     _scheduler.start()
