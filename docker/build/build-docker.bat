@@ -1,4 +1,4 @@
 if not exist "docker" (cd ..)
 if not exist "docker" (cd ..)
-pipreqs ./ --force
-docker build -t stock .
+pipreqs ./src --force
+docker build -t stock -f ./src/dockerfile ./src
