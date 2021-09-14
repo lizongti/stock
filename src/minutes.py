@@ -53,4 +53,4 @@ class MinutesDataSourceUpdater(presto.DataSource):
 
 
 if __name__ == '__main__':
-    MinutesDataSourceUpdater().run(False)
+    MinutesDataSourceUpdater().run()
