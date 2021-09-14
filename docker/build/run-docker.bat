@@ -1,3 +1,1 @@
-docker stop stock
-docker rm stock
-docker run -itd --rm --network presto-network --name stock stock
+docker run -it --rm lizongti/stock:scheduler

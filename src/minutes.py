@@ -18,7 +18,7 @@ class MinutesDataSourceUpdater(presto.DataSource):
             MinutesDataSourceUpdater._schema,
             MinutesDataSourceUpdater._table)
 
-    def run(self: object, days: object):
+    def run(self: object, days: object = 0):
         dt = self._get_date(days)
         self._delete_minutes(dt)
         codes = self._get_codes()
