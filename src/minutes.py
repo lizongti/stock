@@ -2,6 +2,7 @@ import presto
 import akshare
 from retrying import retry
 from tools.time import clock
+import datetime
 
 
 class MinutesDataSourceUpdater(presto.DataSource):
@@ -17,18 +18,31 @@ class MinutesDataSourceUpdater(presto.DataSource):
             MinutesDataSourceUpdater._schema,
             MinutesDataSourceUpdater._table)
 
-    def run(self: object):
+    def run(self: object, days: object):
+        dt = self._get_date(days)
+        self._delete_minutes(dt)
         codes = self._get_codes()
         length = len(codes)
         for i in range(length):
             code = codes[i]
             print('[%s][%s][%s](%d/%d): updating..'
                   % (clock(), self, code, i+1, length), end='')
-            self._update_minutes(code)
+            self._insert_minutes(code, dt)
             print(' -> Done!')
 
-    @retry(stop_max_attempt_number=100)
-    def _update_minutes(self: object, code: str):
+    def _get_date(self: object, days: object) -> str:
+        if isinstance(days, int):
+            now = datetime.datetime.now()
+            delta = datetime.timedelta(days=days)
+            return (now + delta).strftime('%Y-%m-%d')
+        else:
+            return days
+
+    def _delete_minutes(self: object, dt: str):
+        presto.delete(self, {"date": dt})
+
+    # @retry(stop_max_attempt_number=100)
+    def _insert_minutes(self: object, code: str, dt: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
         df.columns = MinutesDataSourceUpdater._columns
@@ -36,9 +50,7 @@ class MinutesDataSourceUpdater(presto.DataSource):
         df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
         df['code'] = df.apply(lambda x: code, axis=1)
 
-        for dt in df['date'].unique():
-            presto.delete(self, {'code': code, 'date': dt})
-            presto.insert(self, df.loc[df['date'] == dt])
+        presto.insert(self, df.loc[df['date'] == dt])
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
@@ -52,4 +64,4 @@ class MinutesDataSourceUpdater(presto.DataSource):
 
 
 if __name__ == '__main__':
-    MinutesDataSourceUpdater().run()
+    MinutesDataSourceUpdater().run(-1)
