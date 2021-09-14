@@ -18,18 +18,18 @@ class MinutesDataSourceUpdater(presto.DataSource):
             MinutesDataSourceUpdater._schema,
             MinutesDataSourceUpdater._table)
 
-    def run(self: object, filter_today=True):
+    def run(self: object):
         codes = self._get_codes()
         length = len(codes)
         for i in range(length):
             code = codes[i]
             print('[%s][%s](%d/%d): updating..'
                   % (self, code, i+1, length), end='')
-            self._update_minutes(code, filter_today)
+            self._update_minutes(code)
             print(' -> Done!')
 
     @retry(stop_max_attempt_number=100)
-    def _update_minutes(self: object, code: str, filter_today):
+    def _update_minutes(self: object, code: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
         df.columns = MinutesDataSourceUpdater._columns
@@ -37,12 +37,7 @@ class MinutesDataSourceUpdater(presto.DataSource):
         df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
         df['code'] = df.apply(lambda x: code, axis=1)
 
-        if filter_today:
-            dts = [date.today().strftime("%Y-%m-%d")]
-        else:
-            dts = df['date'].unique()
-
-        for dt in dts:
+        for dt in df['date'].unique():
             presto.delete(self, {'code': code, 'date': dt})
             presto.insert(self, df.loc[df['date'] == dt])
 
