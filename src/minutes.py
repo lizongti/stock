@@ -2,7 +2,7 @@ from pandas.core.frame import DataFrame
 import presto
 import akshare
 from retrying import retry
-from datetime import date
+from tools.time import clock
 
 
 class MinutesDataSourceUpdater(presto.DataSource):
@@ -23,8 +23,8 @@ class MinutesDataSourceUpdater(presto.DataSource):
         length = len(codes)
         for i in range(length):
             code = codes[i]
-            print('[%s][%s](%d/%d): updating..'
-                  % (self, code, i+1, length), end='')
+            print('[%s][%s][%s](%d/%d): updating..'
+                  % (clock(), self, code, i+1, length), end='')
             self._update_minutes(code)
             print(' -> Done!')
 

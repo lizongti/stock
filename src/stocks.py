@@ -1,6 +1,7 @@
 import presto
 import akshare
 from retrying import retry
+from tools.time import clock
 
 
 class StocksDataSourceUpdater(presto.DataSource):
@@ -15,7 +16,7 @@ class StocksDataSourceUpdater(presto.DataSource):
             StocksDataSourceUpdater._table)
 
     def run(self: object):
-        print('[%s]: updating..' % (self), end='')
+        print('[%s][%s]: updating..' % (clock(), self), end='')
         self._try_update()
         print(' -> Done!')
 
