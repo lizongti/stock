@@ -41,7 +41,7 @@ class MinutesDataSourceUpdater(presto.DataSource):
     def _delete_minutes(self: object, dt: str):
         presto.delete(self, {"date": dt})
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _insert_minutes(self: object, code: str, dt: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
