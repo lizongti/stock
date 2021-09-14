@@ -1,4 +1,3 @@
-from pandas.core.frame import DataFrame
 import presto
 import akshare
 from retrying import retry

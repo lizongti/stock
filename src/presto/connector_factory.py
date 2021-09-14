@@ -3,6 +3,7 @@
 import redis
 from pandas import DataFrame
 from .connector import Connector
+import pyhive as _  # must require
 
 
 class ConnectorFactory(object):
@@ -17,6 +18,7 @@ class ConnectorFactory(object):
 
     def _hive(cls: object) -> Connector:
         return HiveConnector()
+
 
 class HiveConnector(Connector):
     _catalog = 'hive'
