@@ -3,8 +3,8 @@ import akshare
 from retrying import retry
 import datetime
 import sys
-from .tools.time import clock
-from .tools.math import is_int
+from tools.time import clock
+from tools.math import is_int
 
 
 class MinutesDataSourceUpdater(presto.DataSource):
