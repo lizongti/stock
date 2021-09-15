@@ -1,7 +1,7 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 from stocks import StocksDataSourceUpdater
 from minutes import MinutesDataSourceUpdater
-from tools.time import clock
+from .tools.time import clock
 
 _scheduler = BlockingScheduler(timezone="Asia/Shanghai")
 

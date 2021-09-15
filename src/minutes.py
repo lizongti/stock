@@ -1,9 +1,10 @@
 import presto
 import akshare
 from retrying import retry
-from tools.time import clock
 import datetime
 import sys
+from .tools.time import clock
+from .tools.math import is_int
 
 
 class MinutesDataSourceUpdater(presto.DataSource):
@@ -32,7 +33,7 @@ class MinutesDataSourceUpdater(presto.DataSource):
             print(' -> Done!')
 
     def _get_date(self: object, days: object) -> str:
-        if isinstance(days, int) or isinstance(days, str) and days.isdigit():
+        if isinstance(days, int) or isinstance(days, str) and is_int(days):
             now = datetime.datetime.now()
             delta = datetime.timedelta(days=int(days))
             return (now + delta).strftime('%Y-%m-%d')
@@ -56,7 +57,7 @@ class MinutesDataSourceUpdater(presto.DataSource):
 
         presto.insert(self, df.loc[df['date'] == dt])
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         symbols = []
         df = akshare.stock_info_a_code_name()

@@ -1,7 +1,7 @@
 import presto
 import akshare
 from retrying import retry
-from tools.time import clock
+from .tools.time import clock
 
 
 class StocksDataSourceUpdater(presto.DataSource):
