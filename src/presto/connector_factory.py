@@ -2,6 +2,7 @@
 
 import redis
 from pandas import DataFrame
+import pandas
 from .connector import Connector
 import pyhive as _  # must require
 
@@ -115,3 +116,12 @@ class RedisConnector(Connector):
     def _delete_dict(self: object, schema: str, table: str, conditions: dict[str, str]):
         # TODO
         pass
+
+    # def _select_df(self: object, schema: str, table: str) -> DataFrame:
+    #     from sqlalchemy import MetaData, Table, select
+    #     from sqlalchemy.engine import create_engine
+    #     engine = create_engine(
+    #         'presto://%s:%d/redis/%s' %
+    #         (RedisConnector._host, RedisConnector._port, schema))
+    #     return pandas.read_sql("select * from %s.%s.%s" %
+    #                            (RedisConnector._catalog, schema, table), engine)
