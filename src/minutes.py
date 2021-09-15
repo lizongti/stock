@@ -36,7 +36,10 @@ class MinutesDataSourceUpdater(presto.DataSource):
             now = datetime.datetime.now()
             delta = datetime.timedelta(days=int(days))
             return (now + delta).strftime('%Y-%m-%d')
-        elif isinstance(days, None):
+        elif days is None:
+            now = datetime.datetime.now()
+            return now.strftime('%Y-%m-%d')
+        else:
             return days
 
     def _delete_minutes(self: object, dt: str):
