@@ -1,1 +1,1 @@
-docker run -it --rm lizongti/stock:scheduler
+docker run -it --rm lizongti/stock:latest
