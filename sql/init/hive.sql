@@ -1,3 +1,4 @@
+# presto
 create schema if not exists hive.stock;
 create table if not exists hive.stock.minutes(
   datetime varchar,
