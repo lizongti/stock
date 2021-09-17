@@ -2,6 +2,7 @@ import presto
 import akshare
 from retrying import retry
 from tools.time import clock
+from pandas import DataFrame
 
 
 class StocksDataSourceUpdater(presto.DataSource):
@@ -28,10 +29,9 @@ class StocksDataSourceUpdater(presto.DataSource):
         df['key'] = df.apply(lambda x: x.code, axis=1)
         presto.insert(self, df)
 
-    def select(self: object):
-        presto.select(self)
+    def get(self: object) -> DataFrame:
+        return presto.select(self)
 
 
 if __name__ == '__main__':
-    # StocksDataSourceUpdater().run()
-    print(StocksDataSourceUpdater().select())
+    StocksDataSourceUpdater().run()

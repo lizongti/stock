@@ -16,14 +16,15 @@ class PostgresqlConnector(Connector):
 
     def _insert_df(self: object, schema: str, table: str, df: DataFrame):
         from sqlalchemy.engine import create_engine
+        from pandas.io.sql import to_sql
 
         engine = create_engine(
             'presto://%s:%d/postgresql/%s' %
             (PostgresqlConnector._host, PostgresqlConnector._port, schema))
 
-        df.to_sql(name=table, con=engine, if_exists='append',
-                  index=False, index_label=None, chunksize=None,
-                  dtype=None, method='multi')
+        to_sql(name=table, con=engine, if_exists='append',
+               index=False, index_label=None, chunksize=None,
+               dtype=None, method='multi')
 
     def _delete_list(self: object, schema: str, table: str, conditions: list[str]):
         from sqlalchemy import MetaData, Table, delete

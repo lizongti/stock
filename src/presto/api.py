@@ -1,4 +1,4 @@
-
+from pandas import DataFrame
 from . import DataSource
 from .connector_factory import ConnectorFactory
 
@@ -16,6 +16,6 @@ def delete(data_source: DataSource, data: object = {}):
         data_source.schema, data_source.table, data)
 
 
-def select(data_source: DataSource, data: object = {}):
-    _connect_factory.produce(data_source.catalog).select(
+def select(data_source: DataSource, data: object = {}) -> DataFrame:
+    return _connect_factory.produce(data_source.catalog).select(
         data_source.schema, data_source.table, data)

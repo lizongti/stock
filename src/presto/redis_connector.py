@@ -1,22 +1,28 @@
 import redis
+from pandas import DataFrame
 from .connector import Connector
-from pandas import DataFrame, read_sql
 
 
 class RedisConnector(Connector):
     _catalog = 'redis'
-    _host = 'pika'
-    _port = 9221
-    _password = 'adminpass'
-    _db = 0
+    _pika = {
+        'host': 'pika',
+        'port': 9221,
+        'password': 'adminpass',
+        'db': 0,
+    }
+    _presto = {
+        'host': 'presto',
+        'port': 8080,
+    }
 
     def __init__(self: object):
         super(RedisConnector, self).__init__(RedisConnector._catalog)
         self.conn = redis.Redis(
-            host=RedisConnector._host,
-            port=RedisConnector._port,
-            password=RedisConnector._password,
-            db=RedisConnector._db)
+            host=RedisConnector._pika['host'],
+            port=RedisConnector._pika['port'],
+            password=RedisConnector._pika['password'],
+            db=RedisConnector._pika['db'])
 
     def __del__(self: object):
         self.conn.close()
@@ -41,40 +47,37 @@ class RedisConnector(Connector):
         from sqlalchemy import MetaData, Table, select
         from sqlalchemy.sql.expression import text
         from sqlalchemy.engine import create_engine
+        from pandas.io.sql import read_sql
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (RedisConnector._host, RedisConnector._port, schema))
+            (RedisConnector._presto['host'], RedisConnector._presto['port'], schema))
         metadata = MetaData(bind=engine)
-        user_table = Table(
-            table, metadata, autoload=True, autoload_with=engine)
+        user_table = Table(table, metadata, autoload=True,
+                           autoload_with=engine)
 
         sql = select(user_table)
         for condition in conditions:
             sql = sql.where(text(condition))
 
-        with engine.connect() as c:
-            df = c.execute(sql)
-
-        return df
+        return read_sql(sql, engine)
 
     def _select_dict(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
         from sqlalchemy import MetaData, Table, select
         from sqlalchemy.engine import create_engine
+        from pandas.io.sql import read_sql
+
         engine = create_engine(
             'presto://%s:%d/redis/%s' %
-            (RedisConnector._host, RedisConnector._port, schema))
+            (RedisConnector._presto['host'], RedisConnector._presto['port'], schema))
         metadata = MetaData(bind=engine)
-        user_table = Table(table, metadata)
-        #    autoload=True, autoload_with=engine)
+        user_table = Table(table, metadata, autoload=True,
+                           autoload_with=engine)
 
         sql = select(user_table)
         for key, value in conditions.items():
             sql = sql.where(user_table.columns[key] == value)
 
-        # with engine.connect() as c:
-        c = engine.connect()
-        df = c.execute(sql)
-
-        print(c.closed())
+        df = read_sql(sql, engine)
+        print(df)
         return df
