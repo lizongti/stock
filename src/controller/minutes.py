@@ -1,43 +1,56 @@
+if __name__ == '__main__':
+    import sys
+    from os.path import dirname, abspath
+    sys.path.append(dirname(dirname(abspath(__file__))))
 
-import presto
 import datetime
+import sys
+import presto
 import akshare
 from retrying import retry
 from tools.time import clock
 from tools.math import is_int
 
 
-class DaysDataSourceUpdater(presto.DataSource):
-    _catalog = 'postgresql'
+class MinutesController(presto.DataSource):
+    _catalog = 'hive'
     _schema = 'stock'
-    _table = 'days'
-    _columns = ['opening', 'closing', 'higheast', 'loweast', 'volume', 'turnover',
-                'amplitude', 'quote_change', 'ups_and_dows', 'turnover_rate',
-                'date', 'code']
-    # stock_zh_a_hist_df = ak.stock_zh_a_hist(
-    #     symbol="000001", start_date="20170301", end_date='20210907', adjust="qfq")
-    # print(stock_zh_a_hist_df)
+    _table = 'minutes'
+    _columns = ['datetime', 'opening', 'closing', 'higheast',
+                'loweast',  'volume', 'turnover', 'lastest']
 
     def __init__(self: object):
-        super(DaysDataSourceUpdater, self).__init__(
-            DaysDataSourceUpdater._catalog,
-            DaysDataSourceUpdater._schema,
-            DaysDataSourceUpdater._table,
+        super(MinutesController, self).__init__(
+            MinutesController._catalog,
+            MinutesController._schema,
+            MinutesController._table,
         )
 
     def run(self: object, days: object = 0):
         dt = self._get_date(days)
+        self._delete_minutes(dt)
         codes = self._get_codes()
         length = len(codes)
         for i in range(length):
             code = codes[i]
             print('[%s][%s][%s](%d/%d): updating..'
                   % (clock(), self, code, i+1, length), end='')
-            self._update_days(code, dt)
+            self._insert_minutes(code, dt)
             print(' -> Done!')
 
-    def _delete_days(self: object, dt: str):
+    def _delete_minutes(self: object, dt: str):
         presto.delete(self, {'date': dt})
+
+    @retry(stop_max_attempt_number=100)
+    def _insert_minutes(self: object, code: str, dt: str):
+        print('.', end='')
+        df = akshare.stock_zh_a_hist_min_em(symbol=code)
+        df.columns = MinutesController._columns
+        df['time'] = df.apply(lambda x: x['datetime'].split(' ')[1], axis=1)
+        df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
+        df['code'] = df.apply(lambda x: code, axis=1)
+
+        presto.insert(self, df.loc[df['date'] == dt])
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
@@ -59,3 +72,10 @@ class DaysDataSourceUpdater(presto.DataSource):
             return now.strftime('%Y-%m-%d')
         else:
             return days
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        MinutesController().run(sys.argv[1])
+    else:
+        MinutesController().run()

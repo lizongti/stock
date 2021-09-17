@@ -1,20 +1,26 @@
-import presto
+if __name__ == '__main__':
+    import sys
+    from os.path import dirname, abspath
+    sys.path.append(dirname(dirname(abspath(__file__))))
+
+
 import akshare
+import presto
 from retrying import retry
-from tools.time import clock
 from pandas import DataFrame
+from tools.time import clock
 
 
-class StocksDataSourceUpdater(presto.DataSource):
+class StocksController(presto.DataSource):
     _catalog = 'redis'
     _schema = 'stock'
     _table = 'stocks'
 
     def __init__(self: object):
-        super(StocksDataSourceUpdater, self).__init__(
-            StocksDataSourceUpdater._catalog,
-            StocksDataSourceUpdater._schema,
-            StocksDataSourceUpdater._table,
+        super(StocksController, self).__init__(
+            StocksController._catalog,
+            StocksController._schema,
+            StocksController._table,
         )
 
     def run(self: object):
@@ -22,7 +28,7 @@ class StocksDataSourceUpdater(presto.DataSource):
         self._try_update()
         print(' -> Done!')
 
-    @retry(stop_max_attempt_number=100)
+    @ retry(stop_max_attempt_number=100)
     def _try_update(self: object):
         print('.', end='')
         df = akshare.stock_info_a_code_name()
@@ -34,4 +40,4 @@ class StocksDataSourceUpdater(presto.DataSource):
 
 
 if __name__ == '__main__':
-    StocksDataSourceUpdater().run()
+    StocksController().run()
