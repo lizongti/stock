@@ -78,6 +78,4 @@ class RedisConnector(Connector):
         for key, value in conditions.items():
             sql = sql.where(user_table.columns[key] == value)
 
-        df = read_sql(sql, engine)
-        print(df)
-        return df
+        return read_sql(sql, engine)

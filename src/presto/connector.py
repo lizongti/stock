@@ -33,8 +33,8 @@ class Connector(object):
 
     def select(self: object, schema: str, table: str, data: object = {}) -> DataFrame:
         if isinstance(data, list):
-            self._select_list(schema, table, data)
+            return self._select_list(schema, table, data)
         elif isinstance(data, dict):
-            self._select_dict(schema, table, data)
+            return self._select_dict(schema, table, data)
         else:
-            self._default(schema, table, data)
+            return self._default(schema, table, data)

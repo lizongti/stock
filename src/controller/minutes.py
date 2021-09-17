@@ -52,15 +52,10 @@ class MinutesController(presto.DataSource):
 
         presto.insert(self, df.loc[df['date'] == dt])
 
-    @retry(stop_max_attempt_number=100)
+    # @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
-        symbols = []
-        df = akshare.stock_info_a_code_name()
-        for row in df.iterrows():
-            values = row[1].values
-            key = values[0]
-            symbols.append(key)
-        return symbols
+        from controller import StocksController
+        return StocksController().get()['code'].to_list()
 
     def _get_date(self: object, days: object) -> str:
         if isinstance(days, int) or isinstance(days, str) and is_int(days):
