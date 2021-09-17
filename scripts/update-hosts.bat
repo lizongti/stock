@@ -1,7 +1,7 @@
 :: Test of environment variable length
 @echo off & setlocal EnableDelayedExpansion
 REM 将要添加的域名都写在这里，用;号隔开
-set strp=172.169.18.101 omen;172.169.18.101 omen4;172.169.18.101 pika;172.169.18.101 presto
+set strp=172.169.18.101 omen;172.169.18.101 omen4;172.169.18.101 pika;172.169.18.101 presto;172.169.18.101 postgres
 
 set hostsfile="%SystemRoot%\system32\drivers\etc\hosts"
 
@@ -35,6 +35,3 @@ REM 判断变量是否为空，不为空就循环提前。
 if not "!strp!"=="" goto :for
 
 @ipconfig /flushdns
-@echo
-@pause > nul
-@exit
