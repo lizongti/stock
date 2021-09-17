@@ -23,10 +23,18 @@ class Connector(object):
         else:
             self._default(schema, table, data)
 
-    def delete(self: object, schema: str, table: str, data: object):
+    def delete(self: object, schema: str, table: str, data: object = {}):
         if isinstance(data, list):
             self._delete_list(schema, table, data)
         elif isinstance(data, dict):
             self._delete_dict(schema, table, data)
+        else:
+            self._default(schema, table, data)
+
+    def select(self: object, schema: str, table: str, data: object = {}) -> DataFrame:
+        if isinstance(data, list):
+            self._select_list(schema, table, data)
+        elif isinstance(data, dict):
+            self._select_dict(schema, table, data)
         else:
             self._default(schema, table, data)

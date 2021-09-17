@@ -13,7 +13,8 @@ class StocksDataSourceUpdater(presto.DataSource):
         super(StocksDataSourceUpdater, self).__init__(
             StocksDataSourceUpdater._catalog,
             StocksDataSourceUpdater._schema,
-            StocksDataSourceUpdater._table)
+            StocksDataSourceUpdater._table,
+        )
 
     def run(self: object):
         print('[%s][%s]: updating..' % (clock(), self), end='')
@@ -27,6 +28,10 @@ class StocksDataSourceUpdater(presto.DataSource):
         df['key'] = df.apply(lambda x: x.code, axis=1)
         presto.insert(self, df)
 
+    def select(self: object):
+        presto.select(self)
+
 
 if __name__ == '__main__':
-    StocksDataSourceUpdater().run()
+    # StocksDataSourceUpdater().run()
+    print(StocksDataSourceUpdater().select())
