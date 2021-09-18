@@ -18,22 +18,19 @@ class RedisConnector(Connector):
 
     def __init__(self: object):
         super(RedisConnector, self).__init__(RedisConnector._catalog)
-        self.conn = redis.Redis(
-            host=RedisConnector._pika['host'],
-            port=RedisConnector._pika['port'],
-            password=RedisConnector._pika['password'],
-            db=RedisConnector._pika['db'])
-
-    def __del__(self: object):
-        self.conn.close()
 
     def _insert_df(self: object, schema: str, table: str, df: DataFrame):
-        with self.conn.pipeline(transaction=False) as pipe:
-            for index in df.index:
-                mapping = df.loc[index].to_dict()
-                name = '.'.join([schema, table, mapping['key']])
-                pipe.hmset(name, mapping)
-            pipe.execute()
+        with redis.Redis(
+                host=RedisConnector._pika['host'],
+                port=RedisConnector._pika['port'],
+                password=RedisConnector._pika['password'],
+                db=RedisConnector._pika['db']) as conn:
+            with self.conn.pipeline(transaction=False) as pipe:
+                for index in df.index:
+                    mapping = df.loc[index].to_dict()
+                    name = '.'.join([schema, table, mapping['key']])
+                    pipe.hmset(name, mapping)
+                pipe.execute()
 
     def _delete_list(self: object, schema: str, table: str, conditions: list[str]):
         # TODO
@@ -51,7 +48,9 @@ class RedisConnector(Connector):
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (RedisConnector._presto['host'], RedisConnector._presto['port'], schema))
+            (RedisConnector._presto['host'],
+             RedisConnector._presto['port'],
+             schema))
         metadata = MetaData(bind=engine)
         user_table = Table(table, metadata, autoload=True,
                            autoload_with=engine)
@@ -69,7 +68,9 @@ class RedisConnector(Connector):
 
         engine = create_engine(
             'presto://%s:%d/redis/%s' %
-            (RedisConnector._presto['host'], RedisConnector._presto['port'], schema))
+            (RedisConnector._presto['host'],
+             RedisConnector._presto['port'],
+             schema))
         metadata = MetaData(bind=engine)
         user_table = Table(table, metadata, autoload=True,
                            autoload_with=engine)

@@ -3,13 +3,11 @@ if __name__ == '__main__':
     from os.path import dirname, abspath
     sys.path.append(dirname(dirname(abspath(__file__))))
 
-import datetime
 import sys
 import presto
 import akshare
 from retrying import retry
-from tools.time import clock
-from tools.math import is_int
+from tools import time
 
 
 class MinutesController(presto.DataSource):
@@ -27,22 +25,22 @@ class MinutesController(presto.DataSource):
         )
 
     def run(self: object, days: object = 0):
-        dt = self._get_date(days)
-        self._delete_minutes(dt)
+        date = time.date(days)
+        self._delete_minutes(date)
         codes = self._get_codes()
         length = len(codes)
         for i in range(length):
             code = codes[i]
             print('[%s][%s][%s](%d/%d): updating..'
-                  % (clock(), self, code, i+1, length), end='')
-            self._insert_minutes(code, dt)
+                  % (time.clock(), self, code, i+1, length), end='')
+            self._insert_minutes(code, date)
             print(' -> Done!')
 
-    def _delete_minutes(self: object, dt: str):
-        presto.delete(self, {'date': dt})
+    def _delete_minutes(self: object, date: str):
+        presto.delete(self, {'date': date})
 
     @retry(stop_max_attempt_number=100)
-    def _insert_minutes(self: object, code: str, dt: str):
+    def _insert_minutes(self: object, code: str, date: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
         df.columns = MinutesController._columns
@@ -50,23 +48,12 @@ class MinutesController(presto.DataSource):
         df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
         df['code'] = df.apply(lambda x: code, axis=1)
 
-        presto.insert(self, df.loc[df['date'] == dt])
+        presto.insert(self, df.loc[df['date'] == date])
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
         return StocksController().get()['code'].to_list()
-
-    def _get_date(self: object, days: object) -> str:
-        if isinstance(days, int) or isinstance(days, str) and is_int(days):
-            now = datetime.datetime.now()
-            delta = datetime.timedelta(days=int(days))
-            return (now + delta).strftime('%Y-%m-%d')
-        elif days is None:
-            now = datetime.datetime.now()
-            return now.strftime('%Y-%m-%d')
-        else:
-            return days
 
 
 if __name__ == '__main__':

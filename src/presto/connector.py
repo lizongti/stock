@@ -14,7 +14,15 @@ class Connector(object):
         pass
 
     @abstractmethod
-    def _delete_dict(self: object, schema: str, table: str, df: DataFrame):
+    def _delete_list(self: object, schema: str, table: str,  conditions: list[str]):
+        pass
+
+    @abstractmethod
+    def _delete_dict(self: object, schema: str, table: str, conditions: dict[str, str]):
+        pass
+
+    @abstractmethod
+    def _select_dict(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
         pass
 
     def insert(self: object, schema: str, table: str, data: object):

@@ -3,24 +3,18 @@ if __name__ == '__main__':
     from os.path import dirname, abspath
     sys.path.append(dirname(dirname(abspath(__file__))))
 
-import datetime
 import akshare
 import presto
 from retrying import retry
-from tools.time import clock
-from tools.math import is_int
+from tools import time
 
 
 class DaysController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
     _table = 'days'
-    _columns = ['opening', 'closing', 'higheast', 'loweast', 'volume', 'turnover',
-                'amplitude', 'quote_change', 'ups_and_dows', 'turnover_rate',
-                'date', 'code']
-    # stock_zh_a_hist_df = ak.stock_zh_a_hist(
-    #     symbol="000001", start_date="20170301", end_date='20210907', adjust="qfq")
-    # print(stock_zh_a_hist_df)
+    _columns = ['date', 'opening', 'closing', 'higheast', 'loweast', 'volume', 'turnover',
+                'amplitude', 'quote_change', 'ups_and_dows', 'turnover_rate']
 
     def __init__(self: object):
         super(DaysController, self).__init__(
@@ -29,37 +23,68 @@ class DaysController(presto.DataSource):
             DaysController._table,
         )
 
-    def run(self: object, days: object = 0):
-        dt = self._get_date(days)
-        codes = self._get_codes()
-        length = len(codes)
-        for i in range(length):
-            code = codes[i]
-            print('[%s][%s][%s](%d/%d): updating..'
-                  % (clock(), self, code, i+1, length), end='')
-            self._update_days(code, dt)
-            print(' -> Done!')
-
-    def _delete_days(self: object, dt: str):
-        presto.delete(self, {'date': dt})
+    def run(self: object, days: object = 0, **kargs):
+        if len(kargs) > 0:
+            start_date = kargs['start_date']
+            end_date = kargs['end_date']
+            codes = self._get_codes()
+            length = len(codes)
+            for i in range(length):
+                code = codes[i]
+                print('[%s][%s][%s](%d/%d): updating..'
+                      % (time.clock(), self, code, i+1, length), end='')
+                self._delete_days(code, start_date, end_date)
+                self._insert_days(code, start_date, end_date)
+                print(' -> Done!')
+        else:
+            date = time.date(days)
+            self._delete_day(date)
+            codes = self._get_codes()
+            length = len(codes)
+            for i in range(length):
+                code = codes[i]
+                print('[%s][%s][%s](%d/%d): updating..'
+                      % (time.clock(), self, code, i+1, length), end='')
+                self._insert_day(code, date)
+                print(' -> Done!')
 
     @retry(stop_max_attempt_number=100)
-    def _get_codes(self: object) -> list[str]:
-        symbols = []
-        df = akshare.stock_info_a_code_name()
-        for row in df.iterrows():
-            values = row[1].values
-            key = values[0]
-            symbols.append(key)
-        return symbols
+    def _delete_day(self: object, date: str):
+        presto.delete(self, {'date': date})
 
-    def _get_date(self: object, days: object) -> str:
-        if isinstance(days, int) or isinstance(days, str) and is_int(days):
-            now = datetime.datetime.now()
-            delta = datetime.timedelta(days=int(days))
-            return (now + delta).strftime('%Y-%m-%d')
-        elif days is None:
-            now = datetime.datetime.now()
-            return now.strftime('%Y-%m-%d')
-        else:
-            return days
+    @retry(stop_max_attempt_number=100)
+    def _insert_day(self: object, code: str, date: str):
+        print('.', end='')
+        df = akshare.stock_zh_a_hist(
+            symbol=code, start_date=date, end_date=date, adjust="qfq")
+        df.columns = DaysController._columns
+        df['code'] = df.apply(lambda x: code, axis=1)
+
+        presto.insert(self, df.loc[df['date'] == date])
+
+    @retry(stop_max_attempt_number=100)
+    def _delete_days(self: object, code: str, start_date: str, end_date: str):
+        presto.delete(self, ["code='%s'" % (code),
+                             "date >= '%s' and date <= '%s'" % (start_date, end_date)])
+
+    @ retry(stop_max_attempt_number=100)
+    def _insert_days(self: object, code: str, start_date: str, end_date: str):
+        print('.', end='')
+        df = akshare.stock_zh_a_hist(
+            symbol=code, start_date=start_date, end_date=end_date, adjust="qfq")
+        df.columns = DaysController._columns
+        df['code'] = df.apply(lambda x: code, axis=1)
+
+        presto.insert(self, df)
+
+    @ retry(stop_max_attempt_number=100)
+    def _get_codes(self: object) -> list[str]:
+        from controller import StocksController
+        return StocksController().get()['code'].to_list()
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        DaysController().run(sys.argv[1])
+    else:
+        DaysController().run(start_date='1990-12-19', end_date='2021-09-17')

@@ -1,12 +1,20 @@
 from .connector import Connector
 from pandas import DataFrame
-import pyhive as _  # must require
 
 
 class PostgresqlConnector(Connector):
     _catalog = 'postgresql'
-    _host = 'presto'
-    _port = 8080
+    _postgresql = {
+        'host': 'postgres',
+        'port': 5432,
+        'user': 'postgres',
+        'password': 'postgres',
+        'database': 'postgres',
+    }
+    _presto = {
+        'host': 'presto',
+        'port': 8080,
+    }
 
     def __init__(self: object):
         super(PostgresqlConnector, self).__init__(PostgresqlConnector._catalog)
@@ -18,11 +26,11 @@ class PostgresqlConnector(Connector):
         from sqlalchemy.engine import create_engine
         from pandas.io.sql import to_sql
 
-        engine = create_engine(
-            'presto://%s:%d/postgresql/%s' %
-            (PostgresqlConnector._host, PostgresqlConnector._port, schema))
+        c = PostgresqlConnector._presto
+        engine = create_engine('presto://%s:%d/postgresql/%s' %
+                               (c['host'], c['port'], schema))
 
-        to_sql(name=table, con=engine, if_exists='append',
+        to_sql(df, table, engine, if_exists='append',
                index=False, index_label=None, chunksize=None,
                dtype=None, method='multi')
 
@@ -30,37 +38,59 @@ class PostgresqlConnector(Connector):
         from sqlalchemy import MetaData, Table, delete
         from sqlalchemy.sql.expression import text
         from sqlalchemy.engine import create_engine
+        from pandas.io.sql import execute
 
-        engine = create_engine(
-            'presto://%s:%d/postgresql/%s' %
-            (PostgresqlConnector._host, PostgresqlConnector._port, schema))
+        engine = create_engine('postgresql+psycopg2://%s:%s@%s:%d/%s' %
+                               (PostgresqlConnector._postgresql['user'],
+                                PostgresqlConnector._postgresql['password'],
+                                PostgresqlConnector._postgresql['host'],
+                                PostgresqlConnector._postgresql['port'],
+                                PostgresqlConnector._postgresql['database']))
         metadata = MetaData(bind=engine)
         user_table = Table(
-            table, metadata, autoload=True, autoload_with=engine)
+            table, metadata, schema=schema, autoload=True, autoload_with=engine)
 
         sql = delete(user_table)
         for condition in conditions:
             sql = sql.where(text(condition))
 
-        conn = engine.connect()
-        conn.execute(sql)
-        conn.close()
+        execute(sql, engine)
 
     def _delete_dict(self: object, schema: str, table: str, conditions: dict[str, str]):
         from sqlalchemy import MetaData, Table, delete
         from sqlalchemy.engine import create_engine
+        from pandas.io.sql import execute
 
-        engine = create_engine(
-            'presto://%s:%d/postgresql/%s' %
-            (PostgresqlConnector._host, PostgresqlConnector._port, schema))
+        engine = create_engine('postgresql+psycopg2://%s:%s@%s:%d/%s' %
+                               (PostgresqlConnector._postgresql['user'],
+                                PostgresqlConnector._postgresql['password'],
+                                PostgresqlConnector._postgresql['host'],
+                                PostgresqlConnector._postgresql['port'],
+                                PostgresqlConnector._postgresql['database']))
         metadata = MetaData(bind=engine)
         user_table = Table(
-            table, metadata, autoload=True, autoload_with=engine)
+            table, metadata, schema=schema, autoload=True, autoload_with=engine)
 
         sql = delete(user_table)
         for key, value in conditions.items():
             sql = sql.where(user_table.columns[key] == value)
 
-        conn = engine.connect()
-        conn.execute(sql)
-        conn.close()
+        execute(sql, engine)
+
+    def _select_dict(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
+        from sqlalchemy import MetaData, Table, select
+        from sqlalchemy.engine import create_engine
+        from pandas.io.sql import read_sql
+
+        c = PostgresqlConnector._presto
+        engine = create_engine(
+            'presto://%s:%d/redis/%s' % (c['host'], c['port'], schema))
+        metadata = MetaData(bind=engine)
+        user_table = Table(table, metadata, autoload=True,
+                           autoload_with=engine)
+
+        sql = select(user_table)
+        for key, value in conditions.items():
+            sql = sql.where(user_table.columns[key] == value)
+
+        return read_sql(sql, engine)

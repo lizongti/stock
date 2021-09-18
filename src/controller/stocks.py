@@ -8,7 +8,7 @@ import akshare
 import presto
 from retrying import retry
 from pandas import DataFrame
-from tools.time import clock
+from tools import time
 
 
 class StocksController(presto.DataSource):
@@ -24,7 +24,7 @@ class StocksController(presto.DataSource):
         )
 
     def run(self: object):
-        print('[%s][%s]: updating..' % (clock(), self), end='')
+        print('[%s][%s]: updating..' % (time.clock(), self), end='')
         self._try_update()
         print(' -> Done!')
 

@@ -1,6 +1,5 @@
 from .connector import Connector
 from pandas import DataFrame
-import pyhive as _  # must require
 
 
 class HiveConnector(Connector):
@@ -22,7 +21,9 @@ class HiveConnector(Connector):
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (HiveConnector._presto['host'], HiveConnector._presto['port'], schema))
+            (HiveConnector._presto['host'],
+             HiveConnector._presto['port'],
+             schema))
 
         to_sql(df, table, engine, if_exists='append',
                index=False, index_label=None, chunksize=None,
@@ -36,7 +37,9 @@ class HiveConnector(Connector):
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (HiveConnector._presto['host'], HiveConnector._presto['port'], schema))
+            (HiveConnector._presto['host'],
+             HiveConnector._presto['port'],
+             schema))
         metadata = MetaData(bind=engine)
         user_table = Table(
             table, metadata, autoload=True, autoload_with=engine)
@@ -54,7 +57,9 @@ class HiveConnector(Connector):
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
-            (HiveConnector._presto['host'], HiveConnector._presto['port'], schema))
+            (HiveConnector._presto['host'],
+             HiveConnector._presto['port'],
+             schema))
         metadata = MetaData(bind=engine)
         user_table = Table(
             table, metadata, autoload=True, autoload_with=engine)
