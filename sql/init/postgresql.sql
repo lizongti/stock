@@ -1,17 +1,18 @@
 # postgresql
 create schema if not exists stock;
+drop table if exists stock.days;
 create table if not exists stock.days(
-  opening money,
-  closing money,
-  higheast money,
-  loweast money,
+  opening double precision,
+  closing double precision,
+  higheast double precision,
+  loweast double precision,
   volume int,
-  turnover money,
-  amplitude money,
-  quote_change money,
-  ups_and_dows money,
-  turnover_rate money,
+  turnover double precision,
+  amplitude double precision,
+  quote_change double precision,
+  ups_and_dows double precision,
+  turnover_rate double precision,
   date varchar,
   code varchar,
-  constraint primary_key_ primary key (code, date)
+  constraint primary_key_code_date primary key (code, date)
 );
