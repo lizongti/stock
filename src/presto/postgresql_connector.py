@@ -94,3 +94,13 @@ class PostgresqlConnector(Connector):
             sql = sql.where(user_table.columns[key] == value)
 
         return read_sql(sql, engine)
+
+    def _select_sql(self: object, schema: str, sql: str):
+        from sqlalchemy.engine import create_engine
+        from pandas.io.sql import read_sql
+
+        c = PostgresqlConnector._presto
+        engine = create_engine(
+            'presto://%s:%d/redis/%s' % (c['host'], c['port'], schema))
+
+        return read_sql(sql, engine)

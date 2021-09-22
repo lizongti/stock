@@ -22,7 +22,15 @@ class Connector(object):
         pass
 
     @abstractmethod
+    def _select_list(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
+        pass
+
+    @abstractmethod
     def _select_dict(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
+        pass
+
+    @abstractmethod
+    def _select_sql(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
         pass
 
     def insert(self: object, schema: str, table: str, data: object):
@@ -44,5 +52,7 @@ class Connector(object):
             return self._select_list(schema, table, data)
         elif isinstance(data, dict):
             return self._select_dict(schema, table, data)
+        elif isinstance(data, str):
+            return self._select_sql(schema, data)
         else:
             return self._default(schema, table, data)
