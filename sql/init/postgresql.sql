@@ -16,9 +16,9 @@ create table if not exists stock.days(
   code varchar,
   constraint primary_key_code_date primary key (code, date)
 );
-create table if not exists stock.quantity_relative_ratio(
+create table if not exists stock.quantity_ratio(
   ratio double precision,
   date varchar,
   code varchar,
-  constraint quantity_relative_ratio_primary_key_code_date primary key (code, date)
+  constraint quantity_ratio_primary_key_code_date primary key (code, date)
 )
