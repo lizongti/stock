@@ -53,7 +53,7 @@ class QuantityRatioController(presto.DataSource):
             where n >= 1 and n <= 5
             group by code) average,
             (select code, date, volume from
-            (select code, date, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days WHERE where <= '%s')
+            (select code, date, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
             where n=1) day
             where average.code = day.code""" % (date, date)
         return presto.select(self, sql)
