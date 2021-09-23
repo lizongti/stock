@@ -34,7 +34,7 @@ class QuantityRatioController(presto.DataSource):
             self._update_quantity_rate(date)
 
     def _update_quantity_rate(self: object, date: str):
-        print('[%s][%s][%s]: updating...' % (time.clock(), self, date))
+        print('[%s][%s][%s]: updating...' % (time.clock(), self, date), end='')
         self._delete_quantity_ratio(date)
         df = self._select_quantity_ratio(date)
         self._insert_quantity_ratio(df)
@@ -55,7 +55,7 @@ class QuantityRatioController(presto.DataSource):
             (select code, date, volume from
             (select code, date, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
             where n=1) day
-            where average.code = day.code""" % (date, date)
+            where average.code = day.code and day.date='%s'""" % (date, date, date)
         return presto.select(self, sql)
 
 
