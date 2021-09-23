@@ -1,7 +1,7 @@
 from controller.days import DaysController
 from tools.time import clock
 from apscheduler.schedulers.blocking import BlockingScheduler
-from controller import StocksController, MinutesController, DaysController
+from controller import StocksController, MinutesController, DaysController, QuantityRatioController
 
 
 _scheduler = BlockingScheduler(timezone="Asia/Shanghai")
@@ -11,6 +11,7 @@ def _daily():
     StocksController().run()
     DaysController().run()
     MinutesController().run()
+    QuantityRatioController().run()
 
 
 if __name__ == "__main__":
