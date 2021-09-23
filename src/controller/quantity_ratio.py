@@ -50,7 +50,7 @@ class QuantityRatioController(presto.DataSource):
         sql = """select day.code, day.date, (case average.volume when 0 then 1 else day.volume/average.volume end) as ratio from
             (select code, avg(volume) as volume from
             (select code, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
-            where n >= 1 and n <= 5
+            where n >= 2 and n <= 6
             group by code) average,
             (select code, date, volume from
             (select code, date, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
