@@ -47,15 +47,15 @@ class QuantityRatioController(presto.DataSource):
         presto.insert(self, df)
 
     def _select_quantity_ratio(self: object, date: str) -> DataFrame:
-        sql = """select day.code, day.date, day.volume/average.volume as ratio from
+        sql = """select day.code, day.date, (case average.volume when 0 then 1 else day.volume/average.volume end) as ratio from
             (select code, avg(volume) as volume from
-            (select code, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days WHERE date <= '2021-03-21')
+            (select code, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
             where n >= 1 and n <= 5
             group by code) average,
             (select code, date, volume from
-            (select code, date, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days WHERE date <= '2021-03-21')
+            (select code, date, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days WHERE where <= '%s')
             where n=1) day
-            where average.code = day.code"""
+            where average.code = day.code""" % (date, date)
         return presto.select(self, sql)
 
 
@@ -63,5 +63,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         QuantityRatioController().run(sys.argv[1])
     else:
-        QuantityRatioController().run(-1)
-        # QuantityRatioController().run(start_date='1990-12-19', end_date='2021-09-17')
+        QuantityRatioController().run(start_date='1990-12-19', end_date='2021-09-22')
