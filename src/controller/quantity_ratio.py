@@ -7,6 +7,7 @@ if __name__ == '__main__':
 from pandas.core.frame import DataFrame
 import presto
 from tools import time
+from retrying import retry
 
 
 class QuantityRatioController(presto.DataSource):
@@ -28,17 +29,22 @@ class QuantityRatioController(presto.DataSource):
 
             for i in range((end_date - start_date).days + 1):
                 date = time.date(start_date + datetime.timedelta(days=i))
-                self._update_quantity_rate(date)
+                self._update(date)
         else:
             date = time.date(days)
-            self._update_quantity_rate(date)
+            self._update(date)
+
+    @retry(stop_max_attempt_number=100)
+    def _update(self: object, date: str):
+        print('[%s][%s][%s]: updating..' % (time.clock(), self, date), end='')
+        self._update_quantity_rate(date)
+        print(' -> Done!')
 
     def _update_quantity_rate(self: object, date: str):
-        print('[%s][%s][%s]: updating...' % (time.clock(), self, date), end='')
+        print('.', end='')
         self._delete_quantity_ratio(date)
         df = self._select_quantity_ratio(date)
         self._insert_quantity_ratio(df)
-        print(' -> Done!')
 
     def _delete_quantity_ratio(self: object, date: str):
         presto.delete(self, {'date': date})
@@ -63,4 +69,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         QuantityRatioController().run(sys.argv[1])
     else:
-        QuantityRatioController().run(start_date='1990-12-19', end_date='2021-09-22')
+        QuantityRatioController().run(start_date='2008-11-22', end_date='2021-09-22')
