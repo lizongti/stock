@@ -54,7 +54,8 @@ class MovingAverageController(presto.DataSource):
 
     def _select_moving_average(self: object, date: str) -> DataFrame:
         sql = """
-                select code, '%s' as date, 
+                select * from (
+                select code, min(date) as date, 
                 (case when max(n) <= 5 then avg(closing) else sum(case when n <= 5 then closing else 0 end)/5 end) as ma5,
                 (case when max(n) <= 10 then avg(closing) else sum(case when n <= 10 then closing else 0 end)/10 end) as ma10,
                 (case when max(n) <= 20 then avg(closing) else sum(case when n <= 20 then closing else 0 end)/20 end) as ma20,
@@ -69,6 +70,7 @@ class MovingAverageController(presto.DataSource):
                 (select code, date, closing, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
                 where n <= 250
                 group by code
+                ) where date='%s'
             """ % (date, date)
         return presto.select(self, sql)
 
