@@ -29,13 +29,13 @@ class QuantityRatioController(presto.DataSource):
 
             for i in range((end_date - start_date).days + 1):
                 date = time.date(start_date + datetime.timedelta(days=i))
-                self._update(date)
+                self._try_update(date)
         else:
             date = time.date(days)
-            self._update(date)
+            self._try_update(date)
 
     @retry(stop_max_attempt_number=100)
-    def _update(self: object, date: str):
+    def _try_update(self: object, date: str):
         print('[%s][%s][%s]: updating..' % (time.clock(), self, date), end='')
         self._update_quantity_rate(date)
         print(' -> Done!')
@@ -69,4 +69,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         QuantityRatioController().run(sys.argv[1])
     else:
-        QuantityRatioController().run(start_date='2008-11-22', end_date='2021-09-22')
+        QuantityRatioController().run(start_date='2009-03-14', end_date='2021-09-22')

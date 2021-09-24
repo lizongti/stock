@@ -25,7 +25,7 @@ class RedisConnector(Connector):
                 port=RedisConnector._pika['port'],
                 password=RedisConnector._pika['password'],
                 db=RedisConnector._pika['db']) as conn:
-            with self.conn.pipeline(transaction=False) as pipe:
+            with conn.pipeline(transaction=False) as pipe:
                 for index in df.index:
                     mapping = df.loc[index].to_dict()
                     name = '.'.join([schema, table, mapping['key']])
