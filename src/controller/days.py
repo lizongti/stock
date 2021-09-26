@@ -67,7 +67,7 @@ class DaysController(presto.DataSource):
         presto.delete(self, ["code='%s'" % (code),
                              "date >= '%s' and date <= '%s'" % (start_date, end_date)])
 
-    @ retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _insert_days(self: object, code: str, start_date: str, end_date: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist(
@@ -77,10 +77,10 @@ class DaysController(presto.DataSource):
 
         presto.insert(self, df)
 
-    @ retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
-        return StocksController().get()['code'].to_list()
+        presto.select(StocksController())['code'].to_list()
 
 
 if __name__ == '__main__':
