@@ -29,30 +29,34 @@ class QuantityRatioController(presto.DataSource):
 
             for i in range((end_date - start_date).days + 1):
                 date = time.date(start_date + datetime.timedelta(days=i))
-                self._try_update(date)
+                print('[%s][%s][%s]: updating..' %
+                      (time.clock(), self, date), end='')
+                self._update_one_day(date)
+                print(' -> Done!')
         else:
             date = time.date(days)
-            self._try_update(date)
+            print('[%s][%s][%s]: updating..' %
+                  (time.clock(), self, date), end='')
+            self._update_one_day(date)
+            print(' -> Done!')
 
     @retry(stop_max_attempt_number=100)
-    def _try_update(self: object, date: str):
-        print('[%s][%s][%s]: updating..' % (time.clock(), self, date), end='')
-        self._update_quantity_rate(date)
-        print(' -> Done!')
-
-    def _update_quantity_rate(self: object, date: str):
+    def _update_one_day(self: object, date: str):
         print('.', end='')
-        self._delete_quantity_ratio(date)
-        df = self._select_quantity_ratio(date)
-        self._insert_quantity_ratio(df)
+        self._delete_one_day(date)
+        df = self._select_one_day(date)
+        self._insert_one_day(df)
 
-    def _delete_quantity_ratio(self: object, date: str):
+    @retry(stop_max_attempt_number=100)
+    def _delete_one_day(self: object, date: str):
         presto.delete(self, {'date': date})
 
-    def _insert_quantity_ratio(self: object, df: DataFrame):
+    @retry(stop_max_attempt_number=100)
+    def _insert_one_day(self: object, df: DataFrame):
         presto.insert(self, df)
 
-    def _select_quantity_ratio(self: object, date: str) -> DataFrame:
+    @retry(stop_max_attempt_number=100)
+    def _select_one_day(self: object, date: str) -> DataFrame:
         sql = """
             select day.code, day.date, (case average.volume when 0 then 1 else day.volume/average.volume end) as ratio from
             (select code, avg(volume) as volume from
