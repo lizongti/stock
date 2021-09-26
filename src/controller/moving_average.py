@@ -55,7 +55,7 @@ class MovingAverageController(presto.DataSource):
     def _select_moving_average(self: object, date: str) -> DataFrame:
         sql = """
                 select * from (
-                select code, min(date) as date, 
+                select code, max(date) as date, 
                 (case when max(n) <= 5 then avg(closing) else sum(case when n <= 5 then closing else 0 end)/5 end) as ma5,
                 (case when max(n) <= 10 then avg(closing) else sum(case when n <= 10 then closing else 0 end)/10 end) as ma10,
                 (case when max(n) <= 20 then avg(closing) else sum(case when n <= 20 then closing else 0 end)/20 end) as ma20,
