@@ -35,9 +35,6 @@ class StocksController(presto.DataSource):
         df['key'] = df.apply(lambda x: x.code, axis=1)
         presto.insert(self, df)
 
-    def get(self: object) -> DataFrame:
-        return presto.select(self)
-
 
 if __name__ == '__main__':
     StocksController().run()
