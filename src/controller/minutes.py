@@ -53,7 +53,7 @@ class MinutesController(presto.DataSource):
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
-        presto.select(StocksController())['code'].to_list()
+        return presto.select(StocksController())['code'].to_list()
 
 
 if __name__ == '__main__':
