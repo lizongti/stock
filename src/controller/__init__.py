@@ -3,3 +3,4 @@ from .minutes import MinutesController
 from .stocks import StocksController
 from .quantity_ratio import QuantityRatioController
 from .moving_average import MovingAverageController
+from .turn import TurnController

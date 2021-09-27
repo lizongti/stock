@@ -26,9 +26,10 @@ class PostgresqlConnector(Connector):
         from sqlalchemy.engine import create_engine
         from pandas.io.sql import to_sql
 
-        c = PostgresqlConnector._presto
         engine = create_engine('presto://%s:%d/postgresql/%s' %
-                               (c['host'], c['port'], schema))
+                               (PostgresqlConnector._presto['host'],
+                                PostgresqlConnector._presto['port'],
+                                schema))
 
         to_sql(df, table, engine, if_exists='append',
                index=False, index_label=None, chunksize=None,
@@ -82,9 +83,10 @@ class PostgresqlConnector(Connector):
         from sqlalchemy.engine import create_engine
         from pandas.io.sql import read_sql
 
-        c = PostgresqlConnector._presto
-        engine = create_engine(
-            'presto://%s:%d/redis/%s' % (c['host'], c['port'], schema))
+        engine = create_engine('presto://%s:%d/postgresql/%s' %
+                               (PostgresqlConnector._presto['host'],
+                                PostgresqlConnector._presto['port'],
+                                schema))
         metadata = MetaData(bind=engine)
         user_table = Table(table, metadata, autoload=True,
                            autoload_with=engine)
@@ -99,8 +101,9 @@ class PostgresqlConnector(Connector):
         from sqlalchemy.engine import create_engine
         from pandas.io.sql import read_sql
 
-        c = PostgresqlConnector._presto
-        engine = create_engine(
-            'presto://%s:%d/redis/%s' % (c['host'], c['port'], schema))
+        engine = create_engine('presto://%s:%d/postgresql/%s' %
+                               (PostgresqlConnector._presto['host'],
+                                PostgresqlConnector._presto['port'],
+                                schema))
 
         return read_sql(sql, engine)
