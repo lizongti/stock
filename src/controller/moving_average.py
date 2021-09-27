@@ -31,29 +31,29 @@ class MovingAverageController(presto.DataSource):
                 date = time.date(start_date + datetime.timedelta(days=i))
                 print('[%s][%s][%s]: updating..' %
                       (time.clock(), self, date), end='')
-                self._update_one_day(date)
+                self._update_by_day(date)
                 print(' -> Done!')
         else:
             date = time.date(days)
             print('[%s][%s][%s]: updating..' %
                   (time.clock(), self, date), end='')
-            self._update_one_day(date)
+            self._update_by_day(date)
             print(' -> Done!')
 
     @retry(stop_max_attempt_number=100)
-    def _update_one_day(self: object, date: str):
+    def _update_by_day(self: object, date: str):
         print('.', end='')
-        self._delete_one_day(date)
-        df = self._select_one_day(date)
-        self._insert_one_day(df)
+        self._delete_by_day(date)
+        df = self._select_by_day(date)
+        self._insert_by_day(df)
 
-    def _delete_one_day(self: object, date: str):
+    def _delete_by_day(self: object, date: str):
         presto.delete(self, {'date': date})
 
-    def _insert_one_day(self: object, df: DataFrame):
+    def _insert_by_day(self: object, df: DataFrame):
         presto.insert(self, df)
 
-    def _select_one_day(self: object, date: str) -> DataFrame:
+    def _select_by_day(self: object, date: str) -> DataFrame:
         sql = """
                 select * from (
                 select code, max(date) as date, 

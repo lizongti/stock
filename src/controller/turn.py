@@ -29,22 +29,24 @@ class TurnController(presto.DataSource):
 
             for i in range((end_date - start_date).days + 1):
                 date = time.date(start_date + datetime.timedelta(days=i))
-                self._update_one_day(date)
+                self._update_by_day(date)
         else:
             date = time.date(days)
-            self._update_one_day(date)
+            self._update_by_day(date)
 
-    def _update_one_day(self: object, date: str):
+    def _update_by_day(self: object, date: str):
         self._delete_day(date)
         codes = self._get_codes(date)
         length = len(codes)
         for i in range(length):
             code = codes[i]
 
+    def _select_by_day()
+
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object, date: str) -> list[str]:
         from controller import DaysController
-        presto.select(DaysController(), {"date": date})['code'].to_list()
+        return presto.select(DaysController(), {"date": date})['code'].to_list()
 
 
 if __name__ == '__main__':
