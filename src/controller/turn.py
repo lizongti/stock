@@ -46,7 +46,7 @@ class TurnController(presto.DataSource):
             self._update_by_date(date)
             print(' -> Done!')
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _update_by_date(self: object,  date: str):
         print('.', end='')
         self._delete_by_date(date)
@@ -65,7 +65,7 @@ class TurnController(presto.DataSource):
         df = DataFrame(data=data, columns=TurnController._columes)
         presto.insert(self, df)
 
-    @ retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _update_by_dates(self: object, code: str, start_date: str, end_date: str):
         print('.', end='')
         self._delete_by_code_dates(code, start_date, end_date)
