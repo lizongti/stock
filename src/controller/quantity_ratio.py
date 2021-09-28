@@ -24,11 +24,12 @@ class QuantityRatioController(presto.DataSource):
 
     def run(self: object, days: object = 0, **kargs):
         if len(kargs) > 0:
-            start_date = time.to_date(kargs['start_date'])
-            end_date = time.to_date(kargs['end_date'])
+            start_date_object = time.to_date(kargs['start_date'])
+            end_date_object = time.to_date(kargs['end_date'])
 
-            for i in range((end_date - start_date).days + 1):
-                date = time.date(start_date + datetime.timedelta(days=i))
+            for i in range((end_date_object - start_date_object).days + 1):
+                date = time.date(start_date_object +
+                                 datetime.timedelta(days=i))
                 print('[%s][%s][%s]: updating..' %
                       (time.clock(), self, date), end='')
                 self._update_by_date(date)

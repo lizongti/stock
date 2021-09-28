@@ -27,13 +27,14 @@ class DaysController(presto.DataSource):
         if len(kargs) > 0:
             start_date = kargs['start_date']
             end_date = kargs['end_date']
+            self._delete_by_dates(start_date, end_date)
             codes = self._get_codes()
             length = len(codes)
             for i in range(length):
                 code = codes[i]
                 print('[%s][%s][%s](%d/%d): updating..'
                       % (time.clock(), self, code, i+1, length), end='')
-                self._insert_days(code, start_date, end_date)
+                self._insert_by_dates(code, start_date, end_date)
                 print(' -> Done!')
         else:
             date = time.date(days)
@@ -52,6 +53,11 @@ class DaysController(presto.DataSource):
         presto.delete(self, {'date': date})
 
     @retry(stop_max_attempt_number=100)
+    def _delete_by_dates(self: object, code: str, start_date: str, end_date: str):
+        presto.delete(self, ["code='%s'" % (code),
+                             "date >= '%s' and date <= '%s'" % (start_date, end_date)])
+
+    @retry(stop_max_attempt_number=100)
     def _insert_by_date(self: object, code: str, date: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist(
@@ -62,12 +68,7 @@ class DaysController(presto.DataSource):
         presto.insert(self, df.loc[df['date'] == date])
 
     @retry(stop_max_attempt_number=100)
-    def _insert_days(self: object, code: str, start_date: str, end_date: str):
-        presto.delete(self, ["code='%s'" % (code),
-                             "date >= '%s' and date <= '%s'" % (start_date, end_date)])
-
-    @retry(stop_max_attempt_number=100)
-    def _insert_days(self: object, code: str, start_date: str, end_date: str):
+    def _insert_by_dates(self: object, code: str, start_date: str, end_date: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist(
             symbol=code, start_date=start_date, end_date=end_date, adjust="qfq")

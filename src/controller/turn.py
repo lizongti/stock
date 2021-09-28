@@ -27,42 +27,58 @@ class TurnController(presto.DataSource):
 
     def run(self: object, days: object = 0, **kargs):
         if len(kargs) > 0:
-            start_date = time.to_date(kargs['start_date'])
-            end_date = time.to_date(kargs['end_date'])
+            start_date = kargs['start_date']
+            end_date = kargs['end_date']
+            codes = self._get_codes()
+            length = len(codes)
+            for i in range(length):
+                code = codes[i]
+                print('[%s][%s][%s](%d/%d): updating..'
+                      % (time.clock(), self, code, i+1, length), end='')
+                self._update_by_dates(code, start_date, end_date)
+                print(' -> Done!')
 
-            for i in range((end_date - start_date).days + 1):
-                date = time.date(start_date + datetime.timedelta(days=i))
-                self._update_by_date(date)
         else:
             date = time.date(days)
             self._update_by_date(date)
 
-    def _update_by_date(self: object, date: str):
-        codes = self._get_codes(date)
-        length = len(codes)
-        for i in range(length):
-            code = codes[i]
-            print('[%s][%s][%s][%s](%d/%d): updating..' %
-                  (time.clock(), self, date, code, i+1, length), end='')
-            self._update_by_date_code(date, code)
-            print(' -> Done!')
+    # def _update_by_date(self: object, date: str):
+    #     self._delete_by_date(date)
+    #     codes = self._get_codes(date)
+    #     length = len(codes)
+    #     for i in range(length):
+    #         code = codes[i]
+    #         print('[%s][%s][%s][%s](%d/%d): updating..' %
+    #               (time.clock(), self, date, code, i+1, length), end='')
+    #         self._update_by_date_code(code, date)
+    #         print(' -> Done!')
 
-    # @retry(stop_max_attempt_number=100)
-    def _update_by_date_code(self: object, date: str, code: str):
+        # @retry(stop_max_attempt_number=100)
+
+    # def _update_by_date_code(self: object, code: str, date: str):
+    #     print('.', end='')
+    #     self._delete_by_date_code(date, code)
+    #     df = self._get_code_days(code)
+    #     self._insert_by_dates(date, code)
+
+    @ retry(stop_max_attempt_number=100)
+    def _delete_by_date(self: object, code: str, date: str):
+        presto.delete(self, {'code': code, 'date': date})
+
+    @retry(stop_max_attempt_number=100)
+    def _delete_by_dates(self: object, code: str, start_date: str, end_date: str):
+        presto.delete(self, ["code='%s'" % (code),
+                             "date >= '%s' and date <= '%s'" % (start_date, end_date)])
+
+    def _update_by_dates(self: object, code: str, start_date: str, end_date: str):
         print('.', end='')
-        self._delete_by_date_code(date, code)
-        df = self._get_code_days(code)
-        turn = self._calc_code_turn(df)
-        self._insert_by_date_code(turn, date, code)
+        self._delete_by_dates(code, start_date, end_date)
+        df = self._get_days_by_code(code)
+        self._insert_by_dates(code, start_date, end_date, df)
 
-    def _insert_by_date_code(self: object, turn: dict[int, int], date: str, code: str):
-        data = DataFrame(data=[[turn[1], turn[2], turn[3], turn[4], turn[5],
-                                turn[6], turn[7], turn[8], turn[9], date, code]],
-                         columns=TurnController._columes, index=[0])
-        presto.insert(self, data)
-
-    def _calc_code_turn(self: object, df: DataFrame) -> dict[int, int]:
+    def _insert_by_dates(self: object, code: str, start_date: str, end_date: str, df: DataFrame):
         df.sort_values('date')
+        data = []
         turn = {}
         for index in range(0, df.shape[0]):
             for delta in range(1, 10):
@@ -78,24 +94,28 @@ class TurnController(presto.DataSource):
                         turn[delta] = 1
                     else:
                         turn[delta] = turn[delta] - 1
-        return turn
+            date = df.iloc[index]['date']
+            if date >= start_date and date <= end_date:
+                data.append([turn[1], turn[2], turn[3], turn[4], turn[5],
+                             turn[6], turn[7], turn[8], turn[9], date, code])
 
-    def _delete_by_date_code(self: object, date: str, code: str):
-        presto.delete(self, {'date': date, 'code': code})
+        presto.insert(self, DataFrame(
+            data=data, columns=TurnController._columes))
 
-    def _get_code_days(self: object, code: str) -> DataFrame:
+    @ retry(stop_max_attempt_number=100)
+    def _get_days_by_code(self: object, code: str) -> DataFrame:
         from controller import DaysController
         return presto.select(DaysController(), {"code": code})
 
-    # @retry(stop_max_attempt_number=100)
-    def _get_codes(self: object, date: str) -> list[str]:
-        from controller import DaysController
-        return presto.select(DaysController(), {"date": date})['code'].to_list()
+    @retry(stop_max_attempt_number=100)
+    def _get_codes(self: object) -> list[str]:
+        from controller import StocksController
+        return presto.select(StocksController())['code'].to_list()
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnController().run(sys.argv[1])
     else:
-        # TurnController().run(start_date='1990-12-19', end_date='2021-09-30')
-        TurnController().run()
+        TurnController().run(start_date='1990-12-19', end_date='2021-09-30')
+        # TurnController().run()
