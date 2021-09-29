@@ -62,6 +62,7 @@ class IndicatorController(presto.DataSource):
         print('.', end='')
         df = akshare.stock_a_lg_indicator(code)
         df.columns = IndicatorController._columns
+        df['total_mv'] = df['total_mv'].map(lambda x: x*10000)
         df['date'] = df['date'].map(lambda x: time.date(x))
         df['code'] = df.apply(lambda x: code, axis=1)
         df = df.query('date=="%s"' % (date))
@@ -72,6 +73,7 @@ class IndicatorController(presto.DataSource):
         print('.', end='')
         df = akshare.stock_a_lg_indicator(code)
         df.columns = IndicatorController._columns
+        df['total_mv'] = df['total_mv'].map(lambda x: x*10000)
         df['date'] = df['date'].map(lambda x: time.date(x))
         df['code'] = df.apply(lambda x: code, axis=1)
         df = df.query('date>="%s" and date<="%s"' % (start_date, end_date))
