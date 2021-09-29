@@ -151,5 +151,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnController().run(sys.argv[1])
     else:
-        # TurnController().run(start_date='1990-12-19', end_date='2021-09-27')
-        TurnController().run()
+        TurnController().run(start_date='1990-12-19', end_date='2021-09-27')
+        # TurnController().run()
