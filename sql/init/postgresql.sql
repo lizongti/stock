@@ -59,3 +59,18 @@ create table if not exists stock.turn(
 );
 create index if not exists turn_index_code on stock.turn (code);
 create index if not exists turn_index_date on stock.turn (date);
+create table if not exists stock.indicator(
+  pe double precision,
+  pe_ttm double precision,
+  pb double precision,
+  ps double precision,
+  ps_ttm double precision,
+  dv double precision,
+  dv_ttm double precision,
+  total_mv double precision,
+  date varchar,
+  code varchar,
+  constraint indicator_primary_key_code_date primary key (code, date)
+);
+create index if not exists indicator_index_code on stock.indicator (code);
+create index if not exists indicator_index_date on stock.indicator (date);

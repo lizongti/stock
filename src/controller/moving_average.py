@@ -1,9 +1,9 @@
-import datetime
 if __name__ == '__main__':
     import sys
     from os.path import dirname, abspath
     sys.path.append(dirname(dirname(abspath(__file__))))
 
+import datetime
 from pandas.core.frame import DataFrame
 import presto
 from tools import time

@@ -11,7 +11,7 @@ def date(days: object = None) -> str:
         return datetime.datetime.now().strftime('%Y-%m-%d')
     elif isinstance(days, str) and not math.is_int(days):
         return days
-    elif isinstance(days, datetime.date):
+    elif isinstance(days, datetime.date) or isinstance(days, datetime.datetime):
         return days.strftime("%Y-%m-%d")
     else:
         return (datetime.datetime.now() + datetime.timedelta(days=int(days))).strftime('%Y-%m-%d')

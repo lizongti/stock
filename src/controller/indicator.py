@@ -9,18 +9,18 @@ from retrying import retry
 from tools import time
 
 
-class DaysController(presto.DataSource):
+class IndicatorController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
-    _table = 'days'
-    _columns = ['date', 'opening', 'closing', 'higheast', 'loweast', 'volume', 'turnover',
-                'amplitude', 'quote_change', 'ups_and_dows', 'turnover_rate']
+    _table = 'indicator'
+    _columns = ['date', 'pe', 'pe_ttm', 'pb', 'ps', 'ps_ttm',
+                'dv', 'dv_ttm', 'total_mv']
 
     def __init__(self: object):
-        super(DaysController, self).__init__(
-            DaysController._catalog,
-            DaysController._schema,
-            DaysController._table,
+        super(IndicatorController, self).__init__(
+            IndicatorController._catalog,
+            IndicatorController._schema,
+            IndicatorController._table,
         )
 
     def run(self: object, days: object = 0, **kargs):
@@ -60,21 +60,21 @@ class DaysController(presto.DataSource):
     @retry(stop_max_attempt_number=100)
     def _insert_by_date(self: object, code: str, date: str):
         print('.', end='')
-        df = akshare.stock_zh_a_hist(
-            symbol=code, start_date=date, end_date=date, adjust="qfq")
-        df.columns = DaysController._columns
+        df = akshare.stock_a_lg_indicator(code)
+        df.columns = IndicatorController._columns
+        df['date'] = df['date'].map(lambda x: time.date(x))
         df['code'] = df.apply(lambda x: code, axis=1)
-
+        df = df.query('date=="%s"' % (date))
         presto.insert(self, df.loc[df['date'] == date])
 
     @retry(stop_max_attempt_number=100)
     def _insert_by_dates(self: object, code: str, start_date: str, end_date: str):
         print('.', end='')
-        df = akshare.stock_zh_a_hist(
-            symbol=code, start_date=start_date, end_date=end_date, adjust="qfq")
-        df.columns = DaysController._columns
+        df = akshare.stock_a_lg_indicator(code)
+        df.columns = IndicatorController._columns
+        df['date'] = df['date'].map(lambda x: time.date(x))
         df['code'] = df.apply(lambda x: code, axis=1)
-
+        df = df.query('date>="%s" and date<="%s"' % (start_date, end_date))
         presto.insert(self, df)
 
     @retry(stop_max_attempt_number=100)
@@ -85,7 +85,7 @@ class DaysController(presto.DataSource):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        DaysController().run(sys.argv[1])
+        IndicatorController().run(sys.argv[1])
     else:
-        # DaysController().run(start_date='1990-12-19', end_date='2021-09-17')
-        DaysController().run()
+        IndicatorController().run(start_date='1990-12-19', end_date='2021-09-30')
+        # IndicatorController().run()
