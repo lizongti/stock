@@ -16,6 +16,9 @@ class MinutesIndicatorController(presto.DataSource):
     _table = 'minutes_indicator'
     _columns = ['price', 'higheast', 'loweast', 'average',
                 'state', 'ratio', 'market_ratio', 'ratio_state',
+                'ma5_state', 'ma10_state', 'ma20_state', 'ma30_state',
+                'ma40_state', 'ma60_state', 'ma120_state', 'ma200_state',
+                'ma240_state', 'ma250_state',
                 'time', 'date', 'code']
 
     def __init__(self: object):
@@ -61,6 +64,10 @@ class MinutesIndicatorController(presto.DataSource):
         self.insert(data)
 
     def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame, market_df: DataFrame) -> list[list]:
+        moving_average_df = self._get_moving_average_by_code_date(code, date)
+        ma_list = [moving_average_df.iloc[0]['ma5'], moving_average_df.iloc[0]['ma10'], moving_average_df.iloc[0]['ma20'], moving_average_df.iloc[0]['ma30'], moving_average_df.iloc[0]['ma40'],
+                   moving_average_df.iloc[0]['ma60'], moving_average_df.iloc[0]['ma120'], moving_average_df.iloc[0]['ma200'], moving_average_df.iloc[0]['ma240'], moving_average_df.iloc[0]['ma250']]
+
         data = []
         sum = 0
         higheast = None
@@ -94,19 +101,37 @@ class MinutesIndicatorController(presto.DataSource):
                 ratio_state = -1
             else:
                 ratio_state = 0
+
+            ma_state_list = []
+            for index in range(0, len(ma_list)):
+                if price > ma_list[index]:
+                    ma_state_list.append(1)
+                elif price < ma_list[index]:
+                    ma_state_list.append(-1)
+                else:
+                    ma_state_list.append(0)
+
             data.append(
-                [price, higheast, loweast, avg, state, ratio, market_ratio, ratio_state, df.iloc[index]['time'], date, code])
+                [price, higheast, loweast, avg, state, ratio, market_ratio, ratio_state] +
+                ma_state_list + [df.iloc[index]['time'], date, code])
         return data
 
     def _insert(self: object, data: list):
         df = DataFrame(data=data, columns=MinutesIndicatorController._columns)
         presto.insert(self, df)
 
+    def _get_moving_average_by_code_date(self: object, code: str, date: str) -> DataFrame:
+        from controller import MovingAverageController
+        sql = """
+            select * from postgresql.stock.moving_average where code = '%s' and date <= '%s' order by date desc limit 1
+        """ % (code, date)
+        return presto.select(MovingAverageController(), sql)
+
     def _get_minutes_by_code_date(self: object, code: str, date: str) -> DataFrame:
         from controller import MinutesController
         return presto.select(MinutesController(), {'code': code, 'date': date})
 
-    @retry(stop_max_attempt_number=100)
+    @ retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
         return presto.select(StocksController())['code'].to_list()

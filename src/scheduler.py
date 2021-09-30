@@ -1,5 +1,6 @@
 import sys
 from controller.days import DaysController
+from controller.minutes_indicator import MinutesIndicatorController
 from tools.time import clock
 from apscheduler.schedulers.blocking import BlockingScheduler
 from controller import *
@@ -17,6 +18,7 @@ def _daily():
     QuantityTrendController().run()
     MovingAverageController().run()
     TurnoverRatioController().run()
+    MinutesIndicatorController().run()
     TurnController().run()
 
 
@@ -29,6 +31,7 @@ def _run(date: str):
     QuantityTrendController().run(date)
     MovingAverageController().run(date)
     TurnoverRatioController().run(date)
+    MinutesIndicatorController().run(date)
     TurnController().run(date)
 
 
