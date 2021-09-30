@@ -158,5 +158,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         QuantityTrendController().run(sys.argv[1])
     else:
-        # QuantityTrendController().run(start_date='1990-12-19', end_date='2021-09-30')
-        QuantityTrendController().run(-1)
+        # QuantityTrendController().run(start_date='1990-12-19', end_date='2021-09-29')
+        QuantityTrendController().run()
