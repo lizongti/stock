@@ -69,3 +69,35 @@ class HiveConnector(Connector):
             sql = sql.where(user_table.columns[key] == value)
 
         execute(sql, engine)
+
+    def _select_dict(self: object, schema: str, table: str,  conditions: dict[str, str]) -> DataFrame:
+        from sqlalchemy import MetaData, Table, select
+        from sqlalchemy.engine import create_engine
+        from pandas.io.sql import read_sql
+
+        engine = create_engine(
+            'presto://%s:%d/hive/%s' %
+            (HiveConnector._presto['host'],
+             HiveConnector._presto['port'],
+             schema))
+        metadata = MetaData(bind=engine)
+        user_table = Table(table, metadata, autoload=True,
+                           autoload_with=engine)
+
+        sql = select(user_table)
+        for key, value in conditions.items():
+            sql = sql.where(user_table.columns[key] == value)
+
+        return read_sql(sql, engine)
+
+    def _select_sql(self: object, schema: str, sql: str):
+        from sqlalchemy.engine import create_engine
+        from pandas.io.sql import read_sql
+
+        engine = create_engine(
+            'presto://%s:%d/hive/%s' %
+            (HiveConnector._presto['host'],
+             HiveConnector._presto['port'],
+             schema))
+
+        return read_sql(sql, engine)

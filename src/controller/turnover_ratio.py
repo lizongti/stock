@@ -42,7 +42,7 @@ class TurnoverRatioController(presto.DataSource):
             self._update_by_date(date)
             print(' -> Done!')
 
-    @retry(stop_max_attempt_number=100)
+    # @retry(stop_max_attempt_number=100)
     def _update_by_date(self: object, date: str):
         print('.', end='')
         self._delete_by_date(date)
@@ -57,11 +57,11 @@ class TurnoverRatioController(presto.DataSource):
 
     def _select_by_date(self: object, date: str) -> DataFrame:
         sql = """
-            select days.code, days.date, days.turnover/indicator.total_mv as ratio from
-            (select code, turnover from postgresql.stock.days where date = '%s') days,
+            select days.code, days.date, (days.turnover/indicator.total_mv)*100 as ratio from
+            (select code, date, turnover from postgresql.stock.days where date='%s') days,
             (select code, total_mv from postgresql.stock.indicator where date='%s') indicator
             where days.code=indicator.code
-        """
+        """ % (date, date)
         return presto.select(self, sql)
 
 
@@ -69,5 +69,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnoverRatioController().run(sys.argv[1])
     else:
-        # QuantityRatioController().run(start_date='2010-08-06', end_date='2021-09-30')
-        TurnoverRatioController().run()
+        TurnoverRatioController().run(start_date='1990-12-19', end_date='2021-09-29')
+        # TurnoverRatioController().run(-1)

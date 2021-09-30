@@ -32,13 +32,14 @@ class MinutesIndicatorController(presto.DataSource):
         if len(kargs) > 0:
             start_date_object = time.to_date(kargs['start_date'])
             end_date_object = time.to_date(kargs['end_date'])
-
             codes = self._get_codes()
             for i in range((end_date_object - start_date_object).days + 1):
                 date = time.date(start_date_object +
                                  datetime.timedelta(days=i))
+                self._delete_minutes(date)
                 length = len(codes)
-                market_df = self._get_minutes_by_code_date("000001", date)
+                market_df = self._get_minutes_by_code_date(
+                    "000001", date).sort_values('datetime')
                 for i in range(length):
                     code = codes[i]
                     print('[%s][%s][%s][%s](%d/%d): updating..' %
@@ -47,6 +48,7 @@ class MinutesIndicatorController(presto.DataSource):
                     print(' -> Done!')
         else:
             date = time.date(days)
+            self._delete_minutes(date)
             codes = self._get_codes()
             length = len(codes)
             market_df = self._get_minutes_by_code_date(
@@ -61,7 +63,7 @@ class MinutesIndicatorController(presto.DataSource):
     def _update_by_code_date(self: object, code: str, date: str, market_df: DataFrame):
         df = self._get_minutes_by_code_date(code, date).sort_values('datetime')
         data = self._calc_by_code_date(code, date, df, market_df)
-        self.insert(data)
+        self._insert(data)
 
     def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame, market_df: DataFrame) -> list[list]:
         moving_average_df = self._get_moving_average_by_code_date(code, date)
@@ -103,10 +105,10 @@ class MinutesIndicatorController(presto.DataSource):
                 ratio_state = 0
 
             ma_state_list = []
-            for index in range(0, len(ma_list)):
-                if price > ma_list[index]:
+            for ma_index in range(0, len(ma_list)):
+                if price > ma_list[ma_index]:
                     ma_state_list.append(1)
-                elif price < ma_list[index]:
+                elif price < ma_list[ma_index]:
                     ma_state_list.append(-1)
                 else:
                     ma_state_list.append(0)
@@ -115,6 +117,9 @@ class MinutesIndicatorController(presto.DataSource):
                 [price, higheast, loweast, avg, state, ratio, market_ratio, ratio_state] +
                 ma_state_list + [df.iloc[index]['time'], date, code])
         return data
+
+    def _delete_minutes(self: object, date: str):
+        presto.delete(self, {'date': date})
 
     def _insert(self: object, data: list):
         df = DataFrame(data=data, columns=MinutesIndicatorController._columns)
@@ -141,5 +146,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         MinutesIndicatorController().run(sys.argv[1])
     else:
-        # QuantityTrendController().run(start_date='1990-12-19', end_date='2021-09-30')
+        # MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-30')
         MinutesIndicatorController().run(-1)
