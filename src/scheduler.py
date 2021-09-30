@@ -15,7 +15,7 @@ def _daily():
     MinutesController().run()
     QuantityRatioController().run()
     MovingAverageController().run()
-    TurnController().run()
+    # TurnController().run()
 
 
 def _run(date: str):
@@ -25,7 +25,7 @@ def _run(date: str):
     IndicatorController().run(date)
     QuantityRatioController().run(date)
     MovingAverageController().run(date)
-    TurnController().run(date)
+    # TurnController().run(date)
 
 
 if __name__ == "__main__":
