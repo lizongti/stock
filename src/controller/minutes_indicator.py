@@ -15,7 +15,7 @@ class MinutesIndicatorController(presto.DataSource):
     _schema = 'stock'
     _table = 'minutes_indicator'
     _columns = ['price', 'higheast', 'loweast', 'average',
-                'state', 'ratio', 'market_ratio', 'ratio_state',
+                'state', 'ratio',
                 'ma5_state', 'ma10_state', 'ma20_state', 'ma30_state',
                 'ma40_state', 'ma60_state', 'ma120_state', 'ma200_state',
                 'ma240_state', 'ma250_state',
