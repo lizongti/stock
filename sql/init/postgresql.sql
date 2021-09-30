@@ -26,6 +26,14 @@ create table if not exists stock.quantity_ratio(
 );
 create index if not exists quantity_ratio_index_code on stock.quantity_ratio (code);
 create index if not exists quantity_ratio_index_date on stock.quantity_ratio (date);
+create table if not exists stock.quantity_trend(
+  trend int,
+  date varchar,
+  code varchar,
+  constraint quantity_trend_primary_key_code_date primary key (code, date)
+);
+create index if not exists quantity_trend_index_code on stock.quantity_trend (code);
+create index if not exists quantity_trend_index_date on stock.quantity_trend (date);
 create table if not exists stock.moving_average(
   ma5 double precision,
   ma10 double precision,

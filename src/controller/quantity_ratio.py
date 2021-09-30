@@ -76,4 +76,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         QuantityRatioController().run(sys.argv[1])
     else:
-        QuantityRatioController().run(start_date='2010-08-06', end_date='2021-09-30')
+        # QuantityRatioController().run(start_date='2010-08-06', end_date='2021-09-30')
+        QuantityRatioController().run()

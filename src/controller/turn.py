@@ -95,7 +95,7 @@ class TurnController(presto.DataSource):
                 turn[6], turn[7], turn[8], turn[9], date, code]
 
     def _insert_by_dates(self: object, code: str, start_date: str, end_date: str, df: DataFrame):
-        df.sort_values('date')
+        df = df.sort_values('date')
         data = []
         turn = {}
         for index in range(0, df.shape[0]):
@@ -106,12 +106,19 @@ class TurnController(presto.DataSource):
                     if turn[delta] >= 0:
                         turn[delta] = turn[delta] + 1
                     else:
-                        turn[delta] = -1
-                else:
+                        turn[delta] = 1
+                elif df.iloc[index]['closing'] < df.iloc[index-delta]['closing']:
                     if turn[delta] <= 0:
                         turn[delta] = turn[delta] - 1
                     else:
-                        turn[delta] = 1
+                        turn[delta] = -1
+                else:
+                    if turn[delta] > 0:
+                        turn[delta] = turn[delta] + 1
+                    elif turn[delta] < 0:
+                        turn[delta] = turn[delta] - 1
+                    else:
+                        turn[delta] = 0
 
             date = df.iloc[index]['date']
             if date >= start_date and date <= end_date:
