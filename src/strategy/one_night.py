@@ -9,6 +9,8 @@ from tools import time
 
 class OneNightStrategy:
     def run(self: object):
-    
-    def filter_quote_change():
-        quote_change
+
+        # def select_quote_change():
+        #     pass
+
+        # def select_quote_change():

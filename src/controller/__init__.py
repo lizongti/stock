@@ -5,4 +5,5 @@ from .indicator import IndicatorController
 from .quantity_ratio import QuantityRatioController
 from .quantity_trend import QuantityTrendController
 from .moving_average import MovingAverageController
+from .turnover_ratio import TurnoverRatioController
 from .turn import TurnController

@@ -81,3 +81,11 @@ create table if not exists stock.indicator(
 );
 create index if not exists indicator_index_code on stock.indicator (code);
 create index if not exists indicator_index_date on stock.indicator (date);
+create table if not exists stock.turnover_ratio(
+  ratio double precision,
+  date varchar,
+  code varchar,
+  constraint turnover_ratio_primary_key_code_date primary key (code, date)
+);
+create index if not exists turnover_ratio_index_code on stock.turnover_ratio (code);
+create index if not exists turnover_ratio_index_date on stock.turnover_ratio (date);

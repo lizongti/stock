@@ -48,15 +48,12 @@ class QuantityRatioController(presto.DataSource):
         df = self._select_by_date(date)
         self._insert_by_date(df)
 
-    @retry(stop_max_attempt_number=100)
     def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
 
-    @retry(stop_max_attempt_number=100)
     def _insert_by_date(self: object, df: DataFrame):
         presto.insert(self, df)
 
-    @retry(stop_max_attempt_number=100)
     def _select_by_date(self: object, date: str) -> DataFrame:
         sql = """
             select day.code, day.date, (case average.volume when 0 then 1 else day.volume/average.volume end) as ratio from
