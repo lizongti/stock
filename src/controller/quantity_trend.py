@@ -53,7 +53,7 @@ class QuantityTrendController(presto.DataSource):
         data = self._calc_by_dates(code, start_date, end_date, df)
         self._insert(data)
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _update_by_date(self: object,  date: str):
         print('.', end='')
         self._delete_by_date(date)
@@ -158,5 +158,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         QuantityTrendController().run(sys.argv[1])
     else:
-        # QuantityTrendController().run(start_date='1990-01-01', end_date='2021-09-30')
+        # QuantityTrendController().run(start_date='1990-12-19', end_date='2021-09-30')
         QuantityTrendController().run(-1)

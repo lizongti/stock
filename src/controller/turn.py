@@ -47,6 +47,15 @@ class TurnController(presto.DataSource):
             print(' -> Done!')
 
     @retry(stop_max_attempt_number=100)
+    def _update_by_dates(self: object, code: str, start_date: str, end_date: str):
+        print('.', end='')
+        self._delete_by_code_dates(code, start_date, end_date)
+        df = self._get_days_by_code(code)
+        df = df.sort_values('date')
+        data = self._calc_by_dates(code, start_date, end_date, df)
+        self.insert(data)
+
+    @retry(stop_max_attempt_number=100)
     def _update_by_date(self: object,  date: str):
         print('.', end='')
         self._delete_by_date(date)
@@ -65,37 +74,7 @@ class TurnController(presto.DataSource):
         df = DataFrame(data=data, columns=TurnController._columes)
         presto.insert(self, df)
 
-    @retry(stop_max_attempt_number=100)
-    def _update_by_dates(self: object, code: str, start_date: str, end_date: str):
-        print('.', end='')
-        self._delete_by_code_dates(code, start_date, end_date)
-        df = self._get_days_by_code(code)
-        self._insert_by_dates(code, start_date, end_date, df)
-
-    def _calc_by_date(self: object, code: str, date: str, df: DataFrame) -> list[str]:
-        turn = {}
-        for delta in range(1, 10):
-            for index in range(df.shape[0]-1, -1, -1):
-                if delta not in turn:
-                    turn[delta] = 0
-                if df.shape[0]-1 < delta:
-                    break
-                elif df.iloc[index]['closing'] > df.iloc[index-delta]['closing']:
-                    if turn[delta] >= 0:
-                        turn[delta] = turn[delta] + 1
-                    else:
-                        break
-                else:
-                    if turn[delta] <= 0:
-                        turn[delta] = turn[delta] - 1
-                    else:
-                        break
-
-        return [turn[1], turn[2], turn[3], turn[4], turn[5],
-                turn[6], turn[7], turn[8], turn[9], date, code]
-
-    def _insert_by_dates(self: object, code: str, start_date: str, end_date: str, df: DataFrame):
-        df = df.sort_values('date')
+    def _calc_by_dates(self: object, code: str, start_date: str, end_date: str, df: DataFrame):
         data = []
         turn = {}
         for index in range(0, df.shape[0]):
@@ -125,8 +104,40 @@ class TurnController(presto.DataSource):
                 data.append([turn[1], turn[2], turn[3], turn[4], turn[5],
                              turn[6], turn[7], turn[8], turn[9], date, code])
 
-        presto.insert(self, DataFrame(
-            data=data, columns=TurnController._columes))
+        return data
+
+    def _calc_by_date(self: object, code: str, date: str, df: DataFrame) -> list[str]:
+        turn = {}
+        for delta in range(1, 10):
+            for index in range(df.shape[0]-1, -1, -1):
+                if delta not in turn or df.shape[0] <= delta:
+                    turn[delta] = 0
+                elif df.iloc[index]['closing'] > df.iloc[index-delta]['closing']:
+                    if turn[delta] >= 0:
+                        turn[delta] = turn[delta] + 1
+                    else:
+                        turn[delta] = 1
+                        break
+                elif df.iloc[index]['closing'] < df.iloc[index-delta]['closing']:
+                    if turn[delta] <= 0:
+                        turn[delta] = turn[delta] - 1
+                    else:
+                        turn[delta] = -1
+                        break
+                else:
+                    if turn[delta] > 0:
+                        turn[delta] = turn[delta] + 1
+                    elif turn[delta] < 0:
+                        turn[delta] = turn[delta] - 1
+                    else:
+                        turn[delta] = 0
+
+        return [turn[1], turn[2], turn[3], turn[4], turn[5],
+                turn[6], turn[7], turn[8], turn[9], date, code]
+
+    def _insert(self: object, data: list):
+        df = DataFrame(data=data, columns=TurnController._columes)
+        presto.insert(self, df)
 
     def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
@@ -158,5 +169,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnController().run(sys.argv[1])
     else:
-        TurnController().run(start_date='1990-12-19', end_date='2021-09-27')
-        # TurnController().run()
+        # TurnController().run(start_date='1990-12-19', end_date='2021-09-27')
+        TurnController().run(-1)
