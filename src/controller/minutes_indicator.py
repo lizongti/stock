@@ -10,18 +10,19 @@ from tools import time
 from retrying import retry
 
 
-class MinutesAverageController(presto.DataSource):
+class MinutesIndicatorController(presto.DataSource):
     _catalog = 'hive'
     _schema = 'stock'
-    _table = 'minutes'
+    _table = 'minutes_indicator'
     _columns = ['price', 'higheast', 'loweast', 'average',
-                'state', 'time', 'date', 'code']
+                'state', 'ratio', 'market_ratio', 'ratio_state',
+                'time', 'date', 'code']
 
     def __init__(self: object):
-        super(MinutesAverageController, self).__init__(
-            MinutesAverageController._catalog,
-            MinutesAverageController._schema,
-            MinutesAverageController._table,
+        super(MinutesIndicatorController, self).__init__(
+            MinutesIndicatorController._catalog,
+            MinutesIndicatorController._schema,
+            MinutesIndicatorController._table,
         )
 
     def run(self: object, days: object = 0, **kargs):
@@ -34,34 +35,37 @@ class MinutesAverageController(presto.DataSource):
                 date = time.date(start_date_object +
                                  datetime.timedelta(days=i))
                 length = len(codes)
+                market_df = self._get_minutes_by_code_date("000001", date)
                 for i in range(length):
                     code = codes[i]
                     print('[%s][%s][%s][%s](%d/%d): updating..' %
                           (time.clock(), self, date, code, i+1, length), end='')
-                    self._update_by_code_date(code, date)
+                    self._update_by_code_date(code, date, market_df)
                     print(' -> Done!')
         else:
             date = time.date(days)
             codes = self._get_codes()
             length = len(codes)
+            market_df = self._get_minutes_by_code_date(
+                "000001", date).sort_values('datetime')
             for i in range(length):
                 code = codes[i]
                 print('[%s][%s][%s][%s](%d/%d): updating..' %
                       (time.clock(), self, date, code, i+1, length), end='')
-                self._update_by_code_date(code, date)
+                self._update_by_code_date(code, date, market_df)
                 print(' -> Done!')
 
-    def _update_by_code_date(self: object, code: str, date: str):
-        df = self._get_minutes_by_code_date(code, date)
-        df = df.sort_values('datetime')
-        data = self._calc_by_code_date(code, date, df)
+    def _update_by_code_date(self: object, code: str, date: str, market_df: DataFrame):
+        df = self._get_minutes_by_code_date(code, date).sort_values('datetime')
+        data = self._calc_by_code_date(code, date, df, market_df)
         self.insert(data)
 
-    def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame) -> list[list]:
+    def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame, market_df: DataFrame) -> list[list]:
         data = []
         sum = 0
         higheast = None
         loweast = None
+
         for index in range(0, df.shape[0]):
             price = df.iloc[index]['closing']
             if higheast is None:
@@ -80,12 +84,22 @@ class MinutesAverageController(presto.DataSource):
                 state = -1
             else:
                 state = 0
+            ratio = (df.iloc[index]['closing'] /
+                     df.iloc[0]['closing'] - 1) * 100
+            market_ratio = (market_df.iloc[index]['closing'] /
+                            market_df.iloc[0]['closing'] - 1) * 100
+            if ratio > market_ratio:
+                ratio_state = 1
+            elif ratio < market_ratio:
+                ratio_state = -1
+            else:
+                ratio_state = 0
             data.append(
-                [price, higheast, loweast, avg, state, df.iloc[index]['time'], date, code])
+                [price, higheast, loweast, avg, state, ratio, market_ratio, ratio_state, df.iloc[index]['time'], date, code])
         return data
 
     def _insert(self: object, data: list):
-        df = DataFrame(data=data, columns=MinutesAverageController._columns)
+        df = DataFrame(data=data, columns=MinutesIndicatorController._columns)
         presto.insert(self, df)
 
     def _get_minutes_by_code_date(self: object, code: str, date: str) -> DataFrame:
@@ -100,7 +114,7 @@ class MinutesAverageController(presto.DataSource):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        MinutesAverageController().run(sys.argv[1])
+        MinutesIndicatorController().run(sys.argv[1])
     else:
         # QuantityTrendController().run(start_date='1990-12-19', end_date='2021-09-30')
-        MinutesAverageController().run(-1)
+        MinutesIndicatorController().run(-1)
