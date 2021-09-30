@@ -1,6 +1,5 @@
 # postgresql
 create schema if not exists stock;
-drop table if exists stock.days;
 create table if not exists stock.days(
   opening double precision,
   closing double precision,
@@ -82,18 +81,3 @@ create table if not exists stock.indicator(
 );
 create index if not exists indicator_index_code on stock.indicator (code);
 create index if not exists indicator_index_date on stock.indicator (date);
-create table if not exists stock.one_night_strategy(
-  quote_change int,
-  quantity_ratio int,
-  turnover_rate int,
-  market_value int,
-  minutes_higheast int,
-  minutes_average int,
-  moving_average int,
-  quantity_trend int,
-  date varchar,
-  code varchar,
-  constraint indicator_primary_key_code_date primary key (code, date)
-)
-create index if not exists one_night_strategy_index_code on stock.one_night_strategy (code);
-create index if not exists one_night_strategy_index_date on stock.one_night_strategy (date);
