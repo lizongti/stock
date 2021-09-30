@@ -20,8 +20,6 @@ create table if not exists hive.stock.minutes_indicator(
   average double,
   state int,
   ratio double,
-  market_ratio double,
-  ratio_state int,
   ma5_state int,
   ma10_state int,
   ma20_state int,

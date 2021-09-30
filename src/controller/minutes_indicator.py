@@ -38,34 +38,30 @@ class MinutesIndicatorController(presto.DataSource):
                                  datetime.timedelta(days=i))
                 self._delete_minutes(date)
                 length = len(codes)
-                market_df = self._get_minutes_by_code_date(
-                    "000001", date).sort_values('datetime')
                 for i in range(length):
                     code = codes[i]
                     print('[%s][%s][%s][%s](%d/%d): updating..' %
                           (time.clock(), self, date, code, i+1, length), end='')
-                    self._update_by_code_date(code, date, market_df)
+                    self._update_by_code_date(code, date)
                     print(' -> Done!')
         else:
             date = time.date(days)
             self._delete_minutes(date)
             codes = self._get_codes()
             length = len(codes)
-            market_df = self._get_minutes_by_code_date(
-                "000001", date).sort_values('datetime')
             for i in range(length):
                 code = codes[i]
                 print('[%s][%s][%s][%s](%d/%d): updating..' %
                       (time.clock(), self, date, code, i+1, length), end='')
-                self._update_by_code_date(code, date, market_df)
+                self._update_by_code_date(code, date)
                 print(' -> Done!')
 
-    def _update_by_code_date(self: object, code: str, date: str, market_df: DataFrame):
+    def _update_by_code_date(self: object, code: str, date: str):
         df = self._get_minutes_by_code_date(code, date).sort_values('datetime')
-        data = self._calc_by_code_date(code, date, df, market_df)
+        data = self._calc_by_code_date(code, date, df)
         self._insert(data)
 
-    def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame, market_df: DataFrame) -> list[list]:
+    def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame) -> list[list]:
         moving_average_df = self._get_moving_average_by_code_date(code, date)
         ma_list = [moving_average_df.iloc[0]['ma5'], moving_average_df.iloc[0]['ma10'], moving_average_df.iloc[0]['ma20'], moving_average_df.iloc[0]['ma30'], moving_average_df.iloc[0]['ma40'],
                    moving_average_df.iloc[0]['ma60'], moving_average_df.iloc[0]['ma120'], moving_average_df.iloc[0]['ma200'], moving_average_df.iloc[0]['ma240'], moving_average_df.iloc[0]['ma250']]
@@ -95,14 +91,6 @@ class MinutesIndicatorController(presto.DataSource):
                 state = 0
             ratio = (df.iloc[index]['closing'] /
                      df.iloc[0]['closing'] - 1) * 100
-            market_ratio = (market_df.iloc[index]['closing'] /
-                            market_df.iloc[0]['closing'] - 1) * 100
-            if ratio > market_ratio:
-                ratio_state = 1
-            elif ratio < market_ratio:
-                ratio_state = -1
-            else:
-                ratio_state = 0
 
             ma_state_list = []
             for ma_index in range(0, len(ma_list)):
@@ -114,7 +102,7 @@ class MinutesIndicatorController(presto.DataSource):
                     ma_state_list.append(0)
 
             data.append(
-                [price, higheast, loweast, avg, state, ratio, market_ratio, ratio_state] +
+                [price, higheast, loweast, avg, state, ratio] +
                 ma_state_list + [df.iloc[index]['time'], date, code])
         return data
 
