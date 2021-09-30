@@ -13,8 +13,8 @@ class IndicatorController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
     _table = 'indicator'
-    _columns = ['date', 'pe', 'pe_ttm', 'pb', 'ps', 'ps_ttm',
-                'dv', 'dv_ttm', 'total_mv']
+    _rename_columns = ['date', 'pe', 'pe_ttm', 'pb', 'ps', 'ps_ttm',
+                       'dv', 'dv_ttm', 'total_mv']
 
     def __init__(self: object):
         super(IndicatorController, self).__init__(
@@ -61,7 +61,7 @@ class IndicatorController(presto.DataSource):
     def _insert_by_date(self: object, code: str, date: str):
         print('.', end='')
         df = akshare.stock_a_lg_indicator(code)
-        df.columns = IndicatorController._columns
+        df.columns = IndicatorController._rename_columns
         df['total_mv'] = df['total_mv'].map(lambda x: x*10000)
         df['date'] = df['date'].map(lambda x: time.date(x))
         df['code'] = df.apply(lambda x: code, axis=1)

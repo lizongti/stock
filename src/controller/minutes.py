@@ -14,8 +14,8 @@ class MinutesController(presto.DataSource):
     _catalog = 'hive'
     _schema = 'stock'
     _table = 'minutes'
-    _columns = ['datetime', 'opening', 'closing', 'higheast',
-                'loweast',  'volume', 'turnover', 'lastest']
+    _rename_columns = ['datetime', 'opening', 'closing', 'higheast',
+                        'loweast',  'volume', 'turnover', 'lastest']
 
     def __init__(self: object):
         super(MinutesController, self).__init__(
@@ -43,7 +43,7 @@ class MinutesController(presto.DataSource):
     def _insert_minutes(self: object, code: str, date: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
-        df.columns = MinutesController._columns
+        df.columns = MinutesController._rename_columns
         df['time'] = df.apply(lambda x: x['datetime'].split(' ')[1], axis=1)
         df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
         df['code'] = df.apply(lambda x: code, axis=1)

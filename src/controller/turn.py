@@ -14,7 +14,7 @@ class TurnController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
     _table = 'turn'
-    _columes = ['turn1', 'turn2', 'turn3', 'turn4',
+    _columns = ['turn1', 'turn2', 'turn3', 'turn4',
                 'turn5', 'turn6', 'turn7', 'turn8',
                 'turn9', 'date', 'code']
     _limit = 100
@@ -71,7 +71,7 @@ class TurnController(presto.DataSource):
                 code, date, df.query('code=="%s"' % (code)))
             data.append(list)
 
-        df = DataFrame(data=data, columns=TurnController._columes)
+        df = DataFrame(data=data, columns=TurnController._columns)
         presto.insert(self, df)
 
     def _calc_by_dates(self: object, code: str, start_date: str, end_date: str, df: DataFrame):
@@ -136,7 +136,7 @@ class TurnController(presto.DataSource):
                 turn[6], turn[7], turn[8], turn[9], date, code]
 
     def _insert(self: object, data: list):
-        df = DataFrame(data=data, columns=TurnController._columes)
+        df = DataFrame(data=data, columns=TurnController._columns)
         presto.insert(self, df)
 
     def _delete_by_date(self: object, date: str):

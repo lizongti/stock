@@ -14,7 +14,7 @@ class QuantityTrendController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
     _table = 'quantity_trend'
-    _columes = ['trend', 'date', 'code']
+    _columns = ['trend', 'date', 'code']
     _limit = 100
 
     def __init__(self: object):
@@ -125,7 +125,7 @@ class QuantityTrendController(presto.DataSource):
         return [trend, date, code]
 
     def _insert(self: object, data: list):
-        df = DataFrame(data=data, columns=QuantityTrendController._columes)
+        df = DataFrame(data=data, columns=QuantityTrendController._columns)
         presto.insert(self, df)
 
     def _delete_by_date(self: object, date: str):
