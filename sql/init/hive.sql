@@ -13,3 +13,9 @@ create table if not exists hive.stock.minutes(
   date varchar,
   code varchar
 ) with (partitioned_by = array['date', 'code'])
+create table if not exists hive.stock.minutes_average(
+  average double,
+  time varchar,
+  date varchar,
+  code varchar
+) with (partitioned_by = array['date', 'code'])
