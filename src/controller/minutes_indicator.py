@@ -15,11 +15,7 @@ class MinutesIndicatorController(presto.DataSource):
     _schema = 'stock'
     _table = 'minutes_indicator'
     _columns = ['price', 'higheast', 'loweast', 'average',
-                'state', 'ratio',
-                'ma5_state', 'ma10_state', 'ma20_state', 'ma30_state',
-                'ma40_state', 'ma60_state', 'ma120_state', 'ma200_state',
-                'ma240_state', 'ma250_state',
-                'time', 'date', 'code']
+                'state', 'ratio', 'time', 'date', 'code']
 
     def __init__(self: object):
         super(MinutesIndicatorController, self).__init__(
@@ -62,10 +58,6 @@ class MinutesIndicatorController(presto.DataSource):
         self._insert(data)
 
     def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame) -> list[list]:
-        moving_average_df = self._get_moving_average_by_code_date(code, date)
-        ma_list = [moving_average_df.iloc[0]['ma5'], moving_average_df.iloc[0]['ma10'], moving_average_df.iloc[0]['ma20'], moving_average_df.iloc[0]['ma30'], moving_average_df.iloc[0]['ma40'],
-                   moving_average_df.iloc[0]['ma60'], moving_average_df.iloc[0]['ma120'], moving_average_df.iloc[0]['ma200'], moving_average_df.iloc[0]['ma240'], moving_average_df.iloc[0]['ma250']]
-
         data = []
         sum = 0
         higheast = None
@@ -92,18 +84,8 @@ class MinutesIndicatorController(presto.DataSource):
             ratio = (df.iloc[index]['closing'] /
                      df.iloc[0]['closing'] - 1) * 100
 
-            ma_state_list = []
-            for ma_index in range(0, len(ma_list)):
-                if price > ma_list[ma_index]:
-                    ma_state_list.append(1)
-                elif price < ma_list[ma_index]:
-                    ma_state_list.append(-1)
-                else:
-                    ma_state_list.append(0)
-
             data.append(
-                [price, higheast, loweast, avg, state, ratio] +
-                ma_state_list + [df.iloc[index]['time'], date, code])
+                [price, higheast, loweast, avg, state, ratio, df.iloc[index]['time'], date, code])
         return data
 
     def _delete_minutes(self: object, date: str):
@@ -112,13 +94,6 @@ class MinutesIndicatorController(presto.DataSource):
     def _insert(self: object, data: list):
         df = DataFrame(data=data, columns=MinutesIndicatorController._columns)
         presto.insert(self, df)
-
-    def _get_moving_average_by_code_date(self: object, code: str, date: str) -> DataFrame:
-        from controller import MovingAverageController
-        sql = """
-            select * from postgresql.stock.moving_average where code = '%s' and date <= '%s' order by date desc limit 1
-        """ % (code, date)
-        return presto.select(MovingAverageController(), sql)
 
     def _get_minutes_by_code_date(self: object, code: str, date: str) -> DataFrame:
         from controller import MinutesController
@@ -134,5 +109,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         MinutesIndicatorController().run(sys.argv[1])
     else:
-        # MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-30')
-        MinutesIndicatorController().run(-1)
+        MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-29')
+        # MinutesIndicatorController().run(-1)
