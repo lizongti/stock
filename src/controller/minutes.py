@@ -3,7 +3,7 @@ if __name__ == '__main__':
     from os.path import dirname, abspath
     sys.path.append(dirname(dirname(abspath(__file__))))
 
-import sys
+import datetime
 import presto
 import akshare
 from retrying import retry
@@ -15,7 +15,7 @@ class MinutesController(presto.DataSource):
     _schema = 'stock'
     _table = 'minutes'
     _rename_columns = ['datetime', 'opening', 'closing', 'higheast',
-                        'loweast',  'volume', 'turnover', 'lastest']
+                       'loweast',  'volume', 'turnover', 'lastest']
 
     def __init__(self: object):
         super(MinutesController, self).__init__(
@@ -24,23 +24,41 @@ class MinutesController(presto.DataSource):
             MinutesController._table,
         )
 
-    def run(self: object, days: object = 0):
-        date = time.date(days)
-        self._delete_minutes(date)
-        codes = self._get_codes()
-        length = len(codes)
-        for i in range(length):
-            code = codes[i]
-            print('[%s][%s][%s](%d/%d): updating..'
-                  % (time.clock(), self, code, i+1, length), end='')
-            self._insert_minutes(code, date)
-            print(' -> Done!')
+    def run(self: object, days: object = 0, **kargs):
+        if len(kargs) > 0:
+            start_date_object = time.to_date(kargs['start_date'])
+            end_date_object = time.to_date(kargs['end_date'])
+            codes = self._get_codes()
+            for i in range((end_date_object - start_date_object).days + 1):
+                date = time.date(start_date_object +
+                                 datetime.timedelta(days=i))
+                self._delete_by_date(date)
+                codes = self._get_codes()
+                length = len(codes)
+                for i in range(length):
+                    code = codes[i]
+                    print('[%s][%s][%s][%s](%d/%d): updating..'
+                          % (time.clock(), self, date, code, i+1, length), end='')
+                    self._insert(code, date)
+                    print(' -> Done!')
 
-    def _delete_minutes(self: object, date: str):
+        else:
+            date = time.date(days)
+            self._delete_by_date(date)
+            codes = self._get_codes()
+            length = len(codes)
+            for i in range(length):
+                code = codes[i]
+                print('[%s][%s][%s][%s](%d/%d): updating..'
+                      % (time.clock(), self, date, code, i+1, length), end='')
+                self._insert(code, date)
+                print(' -> Done!')
+
+    def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
 
     @retry(stop_max_attempt_number=100)
-    def _insert_minutes(self: object, code: str, date: str):
+    def _insert(self: object, code: str, date: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
         df.columns = MinutesController._rename_columns

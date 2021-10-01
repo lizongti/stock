@@ -32,8 +32,8 @@ class DaysController(presto.DataSource):
             length = len(codes)
             for i in range(length):
                 code = codes[i]
-                print('[%s][%s][%s](%d/%d): updating..'
-                      % (time.clock(), self, code, i+1, length), end='')
+                print('[%s][%s][%s..%s][%s](%d/%d): updating..'
+                      % (time.clock(), self, start_date, end_date, code, i+1, length), end='')
                 self._insert_by_dates(code, start_date, end_date)
                 print(' -> Done!')
         else:
@@ -43,8 +43,8 @@ class DaysController(presto.DataSource):
             length = len(codes)
             for i in range(length):
                 code = codes[i]
-                print('[%s][%s][%s](%d/%d): updating..'
-                      % (time.clock(), self, code, i+1, length), end='')
+                print('[%s][%s][%s][%s](%d/%d): updating..'
+                      % (time.clock(), self, date, code, i+1, length), end='')
                 self._insert_by_date(code, date)
                 print(' -> Done!')
 

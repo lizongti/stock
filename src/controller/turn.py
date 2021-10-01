@@ -34,8 +34,8 @@ class TurnController(presto.DataSource):
             length = len(codes)
             for i in range(length):
                 code = codes[i]
-                print('[%s][%s][%s](%d/%d): updating..'
-                      % (time.clock(), self, code, i+1, length), end='')
+                print('[%s][%s][%s..%s][%s](%d/%d): updating..'
+                      % (time.clock(), self, start_date, end_date, code, i+1, length), end='')
                 self._update_by_dates(code, start_date, end_date)
                 print(' -> Done!')
 
@@ -161,7 +161,7 @@ class TurnController(presto.DataSource):
         """ % (TurnController._limit, date)
         return presto.select(DaysController(), sql)
 
-    @ retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
         return presto.select(StocksController())['code'].to_list()

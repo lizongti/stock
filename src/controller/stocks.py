@@ -25,11 +25,11 @@ class StocksController(presto.DataSource):
 
     def run(self: object):
         print('[%s][%s]: updating..' % (time.clock(), self), end='')
-        self._try_update()
+        self._update()
         print(' -> Done!')
 
-    @ retry(stop_max_attempt_number=100)
-    def _try_update(self: object):
+    @retry(stop_max_attempt_number=100)
+    def _update(self: object):
         print('.', end='')
         df = akshare.stock_info_a_code_name()
         df['key'] = df.apply(lambda x: x.code, axis=1)

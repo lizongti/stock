@@ -32,7 +32,7 @@ class MinutesIndicatorController(presto.DataSource):
             for i in range((end_date_object - start_date_object).days + 1):
                 date = time.date(start_date_object +
                                  datetime.timedelta(days=i))
-                self._delete_minutes(date)
+                self._delete_by_date(date)
                 length = len(codes)
                 for i in range(length):
                     code = codes[i]
@@ -42,7 +42,7 @@ class MinutesIndicatorController(presto.DataSource):
                     print(' -> Done!')
         else:
             date = time.date(days)
-            self._delete_minutes(date)
+            self._delete_by_date(date)
             codes = self._get_codes()
             length = len(codes)
             for i in range(length):
@@ -52,6 +52,7 @@ class MinutesIndicatorController(presto.DataSource):
                 self._update_by_code_date(code, date)
                 print(' -> Done!')
 
+    @retry(stop_max_attempt_number=100)
     def _update_by_code_date(self: object, code: str, date: str):
         df = self._get_minutes_by_code_date(code, date).sort_values('datetime')
         data = self._calc_by_code_date(code, date, df)
@@ -88,7 +89,7 @@ class MinutesIndicatorController(presto.DataSource):
                 [price, higheast, loweast, avg, state, ratio, df.iloc[index]['time'], date, code])
         return data
 
-    def _delete_minutes(self: object, date: str):
+    def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
 
     def _insert(self: object, data: list):
@@ -99,7 +100,7 @@ class MinutesIndicatorController(presto.DataSource):
         from controller import MinutesController
         return presto.select(MinutesController(), {'code': code, 'date': date})
 
-    @ retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
         return presto.select(StocksController())['code'].to_list()
@@ -109,5 +110,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         MinutesIndicatorController().run(sys.argv[1])
     else:
-        MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-29')
-        # MinutesIndicatorController().run(-1)
+        #MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-29')
+        MinutesIndicatorController().run(-1)
