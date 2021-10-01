@@ -34,7 +34,7 @@ class IndicatorController(presto.DataSource):
                 code = codes[i]
                 print('[%s][%s][%s..%s][%s](%d/%d): updating..'
                       % (time.clock(), self, start_date, end_date, code, i+1, length), end='')
-                self._insert_by_dates(code, start_date, end_date)
+                self._update_by_code_dates(code, start_date, end_date)
                 print(' -> Done!')
         else:
             date = time.date(days)
@@ -45,7 +45,7 @@ class IndicatorController(presto.DataSource):
                 code = codes[i]
                 print('[%s][%s][%s][%s](%d/%d): updating..'
                       % (time.clock(), self, date, code, i+1, length), end='')
-                self._insert_by_date(code, date)
+                self._update_by_code_date(code, date)
                 print(' -> Done!')
 
     @retry(stop_max_attempt_number=100)
@@ -58,7 +58,7 @@ class IndicatorController(presto.DataSource):
                       (start_date, end_date)])
 
     @retry(stop_max_attempt_number=100)
-    def _insert_by_date(self: object, code: str, date: str):
+    def _update_by_code_date(self: object, code: str, date: str):
         print('.', end='')
         df = akshare.stock_a_lg_indicator(code)
         df.columns = IndicatorController._rename_columns
@@ -69,7 +69,7 @@ class IndicatorController(presto.DataSource):
         presto.insert(self, df.loc[df['date'] == date])
 
     @retry(stop_max_attempt_number=100)
-    def _insert_by_dates(self: object, code: str, start_date: str, end_date: str):
+    def _update_by_code_dates(self: object, code: str, start_date: str, end_date: str):
         print('.', end='')
         df = akshare.stock_a_lg_indicator(code)
         df.columns = IndicatorController._columns

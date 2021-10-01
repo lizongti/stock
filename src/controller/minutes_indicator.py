@@ -54,6 +54,7 @@ class MinutesIndicatorController(presto.DataSource):
 
     @retry(stop_max_attempt_number=100)
     def _update_by_code_date(self: object, code: str, date: str):
+        print('.', end='')
         df = self._get_minutes_by_code_date(code, date).sort_values('datetime')
         data = self._calc_by_code_date(code, date, df)
         self._insert(data)
