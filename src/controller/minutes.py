@@ -39,7 +39,7 @@ class MinutesController(presto.DataSource):
                     code = codes[i]
                     print('[%s][%s][%s][%s](%d/%d): updating..'
                           % (time.clock(), self, date, code, i+1, length), end='')
-                    self._insert(code, date)
+                    self._update_by_code_date(code, date)
                     print(' -> Done!')
 
         else:
@@ -51,14 +51,15 @@ class MinutesController(presto.DataSource):
                 code = codes[i]
                 print('[%s][%s][%s][%s](%d/%d): updating..'
                       % (time.clock(), self, date, code, i+1, length), end='')
-                self._insert(code, date)
+                self._update_by_code_date(code, date)
                 print(' -> Done!')
 
+    @retry(stop_max_attempt_number=100)
     def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
 
     @retry(stop_max_attempt_number=100)
-    def _insert(self: object, code: str, date: str):
+    def _update_by_code_date(self: object, code: str, date: str):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
         df.columns = MinutesController._rename_columns

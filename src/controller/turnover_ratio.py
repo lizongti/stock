@@ -42,7 +42,7 @@ class TurnoverRatioController(presto.DataSource):
             self._update_by_date(date)
             print(' -> Done!')
 
-    # @retry(stop_max_attempt_number=100)
+    @retry(stop_max_attempt_number=100)
     def _update_by_date(self: object, date: str):
         print('.', end='')
         self._delete_by_date(date)
@@ -69,5 +69,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnoverRatioController().run(sys.argv[1])
     else:
-        TurnoverRatioController().run(start_date='1990-12-19', end_date='2021-09-29')
-        # TurnoverRatioController().run(-1)
+        #TurnoverRatioController().run(start_date='1990-12-19', end_date='2021-09-29')
+        TurnoverRatioController().run(-1)

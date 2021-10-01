@@ -89,6 +89,7 @@ class MinutesIndicatorController(presto.DataSource):
                 [price, higheast, loweast, avg, state, ratio, df.iloc[index]['time'], date, code])
         return data
 
+    @retry(stop_max_attempt_number=100)
     def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
 
