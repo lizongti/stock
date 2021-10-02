@@ -60,6 +60,8 @@ class TurnController(presto.DataSource):
         print('.', end='')
         self._delete_by_date(date)
         df = self._get_days_by_date(date)
+        if df.shape[0] == 0:
+            return
         df.sort_values('date', ascending=False)
         data = []
 
@@ -71,8 +73,7 @@ class TurnController(presto.DataSource):
                 code, date, df.query('code=="%s"' % (code)))
             data.append(list)
 
-        df = DataFrame(data=data, columns=TurnController._columns)
-        presto.insert(self, df)
+        self._insert(data)
 
     def _calc_by_dates(self: object, code: str, start_date: str, end_date: str, df: DataFrame):
         data = []
@@ -100,7 +101,7 @@ class TurnController(presto.DataSource):
                         turn[delta] = 0
 
             date = df.iloc[index]['date']
-            if date >= start_date and date <= end_date:
+            if df.query('date=="%s"' % (date)).shape[0] > 0 and date >= start_date and date <= end_date:
                 data.append([turn[1], turn[2], turn[3], turn[4], turn[5],
                              turn[6], turn[7], turn[8], turn[9], date, code])
 
