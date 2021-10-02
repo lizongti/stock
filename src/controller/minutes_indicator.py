@@ -113,4 +113,4 @@ if __name__ == '__main__':
         MinutesIndicatorController().run(sys.argv[1])
     else:
         #MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-29')
-        MinutesIndicatorController().run(-1)
+        MinutesIndicatorController().run()

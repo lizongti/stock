@@ -81,4 +81,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         MovingAverageController().run(sys.argv[1])
     else:
-        MovingAverageController().run(start_date='2019-02-09', end_date='2021-09-30')
+        #MovingAverageController().run(start_date='2019-02-09', end_date='2021-09-30')
+        MovingAverageController().run()
