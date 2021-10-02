@@ -15,7 +15,7 @@ def _daily():
 
 
 def _run(date):
-    _level0(date)
+    # _level0(date)
     _level1(date)
 
 
@@ -30,7 +30,6 @@ def _level1(date: str):
     QuantityRatioController().run(date)
     QuantityTrendController().run(date)
     MovingAverageController().run(date)
-    TurnoverRatioController().run(date)
     MinutesIndicatorController().run(date)
     TurnController().run(date)
 
