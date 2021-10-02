@@ -58,6 +58,8 @@ class QuantityTrendController(presto.DataSource):
         print('.', end='')
         self._delete_by_date(date)
         df = self._get_days_by_date(date)
+        if df.shape[0] == 0:
+            return
         df = df.sort_values('date', ascending=False)
         data = []
 
