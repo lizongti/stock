@@ -1,6 +1,6 @@
 {
-    "schemaName": "dates",
-    "tableName": "stocks",
+    "schemaName": "stock",
+    "tableName": "dates",
     "key": {
         "dataFormat": "raw",
         "fields": [
