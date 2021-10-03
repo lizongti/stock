@@ -13,7 +13,7 @@ class DaysController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
     _table = 'days'
-    _columns = ['date', 'open', 'close', 'high', 'low', 'turnover', 'volume',
+    _rename_columns = ['date', 'open', 'close', 'high', 'low', 'turnover', 'volume',
                 'amplitude', 'change_rate', 'change', 'turnover_rate']
 
     def __init__(self: object):
@@ -62,7 +62,7 @@ class DaysController(presto.DataSource):
         print('.', end='')
         df = akshare.stock_zh_a_hist(
             symbol=code, start_date=date, end_date=date, adjust="qfq")
-        df.columns = DaysController._columns
+        df.columns = DaysController._rename_columns
         df['code'] = df.apply(lambda x: code, axis=1)
 
         presto.insert(self, df.loc[df['date'] == date])
@@ -72,7 +72,7 @@ class DaysController(presto.DataSource):
         print('.', end='')
         df = akshare.stock_zh_a_hist(
             symbol=code, start_date=start_date, end_date=end_date, adjust="qfq")
-        df.columns = DaysController._columns
+        df.columns = DaysController._rename_columns
         df['code'] = df.apply(lambda x: code, axis=1)
 
         presto.insert(self, df)

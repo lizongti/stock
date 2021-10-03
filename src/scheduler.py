@@ -13,7 +13,11 @@ def _daily():
 
 
 def _run(date):
-    # _level0(date)
+    DatesController().run()
+    if not DatesController().is_open(date):
+        return
+
+    _level0(date)
     _level1(date)
 
 
