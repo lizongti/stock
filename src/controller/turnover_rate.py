@@ -73,5 +73,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnoverRateController().run(sys.argv[1])
     else:
-        # QuantityRatioController().run(start_date='2010-08-06', end_date='2021-09-30')
+        # TurnoverRateController().run(start_date='1990-12-19', end_date='2021-09-29')
         TurnoverRateController().run()
