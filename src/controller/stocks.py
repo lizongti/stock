@@ -34,6 +34,9 @@ class StocksController(presto.DataSource):
         df['key'] = df.apply(lambda x: x.code, axis=1)
         presto.insert(self, df)
 
+    def get(self: object) -> list[str]:
+        return presto.select(self)['code'].to_list()
+
 
 if __name__ == '__main__':
     StocksController().run()
