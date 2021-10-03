@@ -13,7 +13,7 @@ class DaysController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
     _table = 'days'
-    _columns = ['date', 'opening', 'closing', 'higheast', 'loweast', 'turnover', 'volume',
+    _columns = ['date', 'open', 'close', 'high', 'low', 'turnover', 'volume',
                 'amplitude', 'change_rate', 'change', 'turnover_rate']
 
     def __init__(self: object):

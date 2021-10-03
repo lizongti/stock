@@ -82,12 +82,12 @@ class TurnController(presto.DataSource):
             for delta in range(1, 10):
                 if index < delta:
                     turn[delta] = 0
-                elif df.iloc[index]['closing'] > df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] > df.iloc[index-delta]['close']:
                     if turn[delta] >= 0:
                         turn[delta] = turn[delta] + 1
                     else:
                         turn[delta] = 1
-                elif df.iloc[index]['closing'] < df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] < df.iloc[index-delta]['close']:
                     if turn[delta] <= 0:
                         turn[delta] = turn[delta] - 1
                     else:
@@ -115,13 +115,13 @@ class TurnController(presto.DataSource):
             for index in range(df.shape[0]-1, -1, -1):
                 if df.shape[0] <= delta:
                     turn[delta] = 0
-                elif df.iloc[index]['closing'] > df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] > df.iloc[index-delta]['close']:
                     if turn[delta] >= 0:
                         turn[delta] = turn[delta] + 1
                     else:
                         turn[delta] = 1
                         break
-                elif df.iloc[index]['closing'] < df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] < df.iloc[index-delta]['close']:
                     if turn[delta] <= 0:
                         turn[delta] = turn[delta] - 1
                     else:

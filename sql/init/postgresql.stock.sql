@@ -1,10 +1,10 @@
 # postgresql
 create schema if not exists stock;
 create table if not exists stock.days(
-  opening double precision,
-  closing double precision,
-  higheast double precision,
-  loweast double precision,
+  open double precision,
+  close double precision,
+  high double precision,
+  low double precision,
   turnover int,
   volume double precision,
   amplitude double precision,
@@ -17,22 +17,37 @@ create table if not exists stock.days(
 );
 create index if not exists days_index_code on stock.days (code);
 create index if not exists days_index_date on stock.days (date);
-create table if not exists stock.quantity_ratio(
-  ratio double precision,
+create table if not exists stock.indicator(
+  pe double precision,
+  pe_ttm double precision,
+  pb double precision,
+  ps double precision,
+  ps_ttm double precision,
+  dv double precision,
+  dv_ttm double precision,
+  total_mv double precision,
   date varchar,
   code varchar,
-  constraint quantity_ratio_primary_key_code_date primary key (code, date)
+  constraint indicator_primary_key_code_date primary key (code, date)
 );
-create index if not exists quantity_ratio_index_code on stock.quantity_ratio (code);
-create index if not exists quantity_ratio_index_date on stock.quantity_ratio (date);
-create table if not exists stock.quantity_trend(
+create index if not exists indicator_index_code on stock.indicator (code);
+create index if not exists indicator_index_date on stock.indicator (date);
+create table if not exists stock.turnover_trend(
   trend int,
   date varchar,
   code varchar,
-  constraint quantity_trend_primary_key_code_date primary key (code, date)
+  constraint turnover_trend_primary_key_code_date primary key (code, date)
 );
-create index if not exists quantity_trend_index_code on stock.quantity_trend (code);
-create index if not exists quantity_trend_index_date on stock.quantity_trend (date);
+create index if not exists turnover_trend_index_code on stock.turnover_trend (code);
+create index if not exists turnover_trend_index_date on stock.turnover_trend (date);
+create table if not exists stock.turnover_rate(
+  rate double precision,
+  date varchar,
+  code varchar,
+  constraint turnover_rate_primary_key_code_date primary key (code, date)
+);
+create index if not exists turnover_rate_index_code on stock.turnover_rate (code);
+create index if not exists turnover_rate_index_date on stock.turnover_rate (date);
 create table if not exists stock.moving_average(
   ma5 double precision,
   ma10 double precision,
@@ -66,26 +81,3 @@ create table if not exists stock.turn(
 );
 create index if not exists turn_index_code on stock.turn (code);
 create index if not exists turn_index_date on stock.turn (date);
-create table if not exists stock.indicator(
-  pe double precision,
-  pe_ttm double precision,
-  pb double precision,
-  ps double precision,
-  ps_ttm double precision,
-  dv double precision,
-  dv_ttm double precision,
-  total_mv double precision,
-  date varchar,
-  code varchar,
-  constraint indicator_primary_key_code_date primary key (code, date)
-);
-create index if not exists indicator_index_code on stock.indicator (code);
-create index if not exists indicator_index_date on stock.indicator (date);
-create table if not exists stock.turnover_ratio(
-  ratio double precision,
-  date varchar,
-  code varchar,
-  constraint turnover_ratio_primary_key_code_date primary key (code, date)
-);
-create index if not exists turnover_ratio_index_code on stock.turnover_ratio (code);
-create index if not exists turnover_ratio_index_date on stock.turnover_ratio (date);

@@ -10,16 +10,16 @@ from tools import time
 from retrying import retry
 
 
-class QuantityRatioController(presto.DataSource):
+class TurnoverRateController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
-    _table = 'quantity_ratio'
+    _table = 'turnover_rate'
 
     def __init__(self: object):
-        super(QuantityRatioController, self).__init__(
-            QuantityRatioController._catalog,
-            QuantityRatioController._schema,
-            QuantityRatioController._table,
+        super(TurnoverRateController, self).__init__(
+            TurnoverRateController._catalog,
+            TurnoverRateController._schema,
+            TurnoverRateController._table,
         )
 
     def run(self: object, days: object = 0, **kargs):
@@ -56,13 +56,13 @@ class QuantityRatioController(presto.DataSource):
 
     def _select_by_date(self: object, date: str) -> DataFrame:
         sql = """
-            select day.code, day.date, (case average.volume when 0 then 1 else day.volume/average.volume end) as ratio from
-            (select code, avg(volume) as volume from
-            (select code, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
+            select day.code, day.date, (case average.turnover when 0 then 1 else day.turnover/average.turnover end) as rate from
+            (select code, avg(turnover) as turnover from
+            (select code, turnover, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
             where n >= 2 and n <= 6
             group by code) average,
-            (select code, date, volume from
-            (select code, date, volume, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
+            (select code, date, turnover from
+            (select code, date, turnover, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
             where n=1) day
             where average.code = day.code and day.date='%s'
             """ % (date, date, date)
@@ -71,7 +71,7 @@ class QuantityRatioController(presto.DataSource):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        QuantityRatioController().run(sys.argv[1])
+        TurnoverRateController().run(sys.argv[1])
     else:
         # QuantityRatioController().run(start_date='2010-08-06', end_date='2021-09-30')
-        QuantityRatioController().run()
+        TurnoverRateController().run()

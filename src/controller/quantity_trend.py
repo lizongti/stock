@@ -10,7 +10,7 @@ from tools import time
 from retrying import retry
 
 
-class QuantityTrendController(presto.DataSource):
+class TurnoverTrendController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
     _table = 'quantity_trend'
@@ -18,10 +18,10 @@ class QuantityTrendController(presto.DataSource):
     _limit = 100
 
     def __init__(self: object):
-        super(QuantityTrendController, self).__init__(
-            QuantityTrendController._catalog,
-            QuantityTrendController._schema,
-            QuantityTrendController._table,
+        super(TurnoverTrendController, self).__init__(
+            TurnoverTrendController._catalog,
+            TurnoverTrendController._schema,
+            TurnoverTrendController._table,
         )
 
     def run(self: object, days: object = 0, **kargs):
@@ -77,12 +77,12 @@ class QuantityTrendController(presto.DataSource):
         data = []
         trend = 0
         for index in range(1, df.shape[0]):
-            if df.iloc[index]['volume'] > df.iloc[index-1]['volume']:
+            if df.iloc[index]['turnover'] > df.iloc[index-1]['turnover']:
                 if trend >= 0:
                     trend = trend + 1
                 else:
                     trend = 1
-            elif df.iloc[index]['volume'] < df.iloc[index-1]['volume']:
+            elif df.iloc[index]['turnover'] < df.iloc[index-1]['turnover']:
                 if trend <= 0:
                     trend = trend - 1
                 else:
@@ -105,13 +105,13 @@ class QuantityTrendController(presto.DataSource):
     def _calc_by_date(self: object, code: str, date: str, df: DataFrame) -> list[str]:
         trend = 0
         for index in range(df.shape[0]-2, -1, -1):
-            if df.iloc[index]['closing'] > df.iloc[index-1]['closing']:
+            if df.iloc[index]['close'] > df.iloc[index-1]['close']:
                 if trend >= 0:
                     trend = trend + 1
                 else:
                     trend = 1
                     break
-            elif df.iloc[index]['closing'] < df.iloc[index-1]['closing']:
+            elif df.iloc[index]['close'] < df.iloc[index-1]['close']:
                 if trend <= 0:
                     trend = trend - 1
                 else:
@@ -128,7 +128,7 @@ class QuantityTrendController(presto.DataSource):
         return [trend, date, code]
 
     def _insert(self: object, data: list):
-        df = DataFrame(data=data, columns=QuantityTrendController._columns)
+        df = DataFrame(data=data, columns=TurnoverTrendController._columns)
         presto.insert(self, df)
 
     def _delete_by_date(self: object, date: str):
@@ -148,7 +148,7 @@ class QuantityTrendController(presto.DataSource):
             select * from (
             select *, row_number() over (partition by code order by date desc)  as n from postgresql.stock.days
             ) where n <= %d and date <= '%s'
-        """ % (QuantityTrendController._limit, date)
+        """ % (TurnoverTrendController._limit, date)
         return presto.select(DaysController(), sql)
 
     @retry(stop_max_attempt_number=100)
@@ -159,7 +159,7 @@ class QuantityTrendController(presto.DataSource):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        QuantityTrendController().run(sys.argv[1])
+        TurnoverTrendController().run(sys.argv[1])
     else:
         #QuantityTrendController().run(start_date='1990-12-19', end_date='2021-09-29')
-        QuantityTrendController().run()
+        TurnoverTrendController().run()

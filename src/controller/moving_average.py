@@ -58,18 +58,18 @@ class MovingAverageController(presto.DataSource):
         sql = """
                 select * from (
                 select code, max(date) as date, 
-                (case when max(n) <= 5 then avg(closing) else sum(case when n <= 5 then closing else 0 end)/5 end) as ma5,
-                (case when max(n) <= 10 then avg(closing) else sum(case when n <= 10 then closing else 0 end)/10 end) as ma10,
-                (case when max(n) <= 20 then avg(closing) else sum(case when n <= 20 then closing else 0 end)/20 end) as ma20,
-                (case when max(n) <= 30 then avg(closing) else sum(case when n <= 30 then closing else 0 end)/30 end) as ma30,
-                (case when max(n) <= 40 then avg(closing) else sum(case when n <= 40 then closing else 0 end)/40 end) as ma40,
-                (case when max(n) <= 60 then avg(closing) else sum(case when n <= 60 then closing else 0 end)/60 end) as ma60,
-                (case when max(n) <= 120 then avg(closing) else sum(case when n <= 120 then closing else 0 end)/120 end) as ma120,
-                (case when max(n) <= 200 then avg(closing) else sum(case when n <= 200 then closing else 0 end)/200 end) as ma200,
-                (case when max(n) <= 240 then avg(closing) else sum(case when n <= 240 then closing else 0 end)/240 end) as ma240,
-                (case when max(n) <= 250 then avg(closing) else sum(case when n <= 250 then closing else 0 end)/250 end) as ma250
+                (case when max(n) <= 5 then avg(close) else sum(case when n <= 5 then close else 0 end)/5 end) as ma5,
+                (case when max(n) <= 10 then avg(close) else sum(case when n <= 10 then close else 0 end)/10 end) as ma10,
+                (case when max(n) <= 20 then avg(close) else sum(case when n <= 20 then close else 0 end)/20 end) as ma20,
+                (case when max(n) <= 30 then avg(close) else sum(case when n <= 30 then close else 0 end)/30 end) as ma30,
+                (case when max(n) <= 40 then avg(close) else sum(case when n <= 40 then close else 0 end)/40 end) as ma40,
+                (case when max(n) <= 60 then avg(close) else sum(case when n <= 60 then close else 0 end)/60 end) as ma60,
+                (case when max(n) <= 120 then avg(close) else sum(case when n <= 120 then close else 0 end)/120 end) as ma120,
+                (case when max(n) <= 200 then avg(close) else sum(case when n <= 200 then close else 0 end)/200 end) as ma200,
+                (case when max(n) <= 240 then avg(close) else sum(case when n <= 240 then close else 0 end)/240 end) as ma240,
+                (case when max(n) <= 250 then avg(close) else sum(case when n <= 250 then close else 0 end)/250 end) as ma250
                 from
-                (select code, date, closing, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
+                (select code, date, close, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
                 where n <= 250
                 group by code
                 ) where date='%s'

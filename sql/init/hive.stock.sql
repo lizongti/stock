@@ -2,14 +2,13 @@
 create schema if not exists hive.stock;
 create table if not exists hive.stock.minutes(
   datetime varchar,
-  opening double,
-  closing double,
-  higheast double,
-  loweast double,
-  volume int,
-  turnover double,
-  lastest double,
+  open double,
+  close double,
+  high double,
+  low double,
+  turnover int,
+  volume double,
+  code varchar,
   time varchar,
   date varchar,
-  code varchar
-) with (partitioned_by = array['date', 'code'])
+) with (partitioned_by = array['date'])
