@@ -25,7 +25,7 @@ def _level0(date):
 
 
 def _level1(date: str):
-    QuantityRatioController().run(date)
+    TurnoverRateController().run(date)
     TurnoverTrendController().run(date)
     MovingAverageController().run(date)
     TurnController().run(date)

@@ -13,7 +13,7 @@ from retrying import retry
 class TurnoverTrendController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
-    _table = 'quantity_trend'
+    _table = 'turnover_trend'
     _columns = ['trend', 'date', 'code']
     _limit = 100
 

@@ -63,10 +63,12 @@ class MinutesController(presto.DataSource):
         print('.', end='')
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
         df.columns = MinutesController._rename_columns
-        df.pop('last')
+
         df['code'] = df.apply(lambda x: code, axis=1)
         df['time'] = df.apply(lambda x: x['datetime'].split(' ')[1], axis=1)
         df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
+        df.pop('last')
+        df.pop('datetime')
 
         presto.insert(self, df.loc[df['date'] == date])
 

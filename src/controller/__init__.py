@@ -3,7 +3,7 @@ from .days import DaysController
 from .minutes import MinutesController
 from .indicator import IndicatorController
 
-from .quantity_ratio import QuantityRatioController
-from .quantity_trend import TurnoverTrendController
+from .turnover_rate import TurnoverRateController
+from .turnover_trend import TurnoverTrendController
 from .moving_average import MovingAverageController
 from .turn import TurnController
