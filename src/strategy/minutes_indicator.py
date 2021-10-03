@@ -114,3 +114,16 @@ if __name__ == '__main__':
     else:
         #MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-29')
         MinutesIndicatorController().run()
+
+
+create table if not exists hive.stock.minutes_indicator(
+    price double,
+    higheast double,
+    loweast double,
+    average double,
+    state int,
+    ratio double,
+    time varchar,
+    date varchar,
+    code varchar
+) with (partitioned_by=array['date', 'code'])

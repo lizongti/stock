@@ -13,14 +13,3 @@ create table if not exists hive.stock.minutes(
   date varchar,
   code varchar
 ) with (partitioned_by = array['date', 'code'])
-create table if not exists hive.stock.minutes_indicator(
-  price double,
-  higheast double,
-  loweast double,
-  average double,
-  state int,
-  ratio double,
-  time varchar,
-  date varchar,
-  code varchar
-) with (partitioned_by = array['date', 'code'])
