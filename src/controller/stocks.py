@@ -7,7 +7,6 @@ if __name__ == '__main__':
 import akshare
 import presto
 from retrying import retry
-from pandas import DataFrame
 from tools import time
 
 

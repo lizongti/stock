@@ -26,7 +26,7 @@
             },
             {
                 "name": "open",
-                "type": "boolean",
+                "type": "varchar",
                 "mapping": "open"
             }
         ]

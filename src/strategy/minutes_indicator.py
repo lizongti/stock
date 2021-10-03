@@ -4,7 +4,7 @@ if __name__ == '__main__':
     sys.path.append(dirname(dirname(abspath(__file__))))
 
 import datetime
-from pandas.core.frame import DataFrame
+from pandas import DataFrame
 import presto
 from tools import time
 from retrying import retry
