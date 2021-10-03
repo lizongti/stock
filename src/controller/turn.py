@@ -62,7 +62,7 @@ class TurnController(presto.DataSource):
         df = self._get_days_by_date(date)
         if df.shape[0] == 0:
             return
-        df.sort_values('date', ascending=False)
+        df.sort_values('date')
         data = []
 
         codes = self._get_codes()

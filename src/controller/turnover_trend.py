@@ -60,7 +60,7 @@ class TurnoverTrendController(presto.DataSource):
         df = self._get_days_by_date(date)
         if df.shape[0] == 0:
             return
-        df = df.sort_values('date', ascending=False)
+        df = df.sort_values('date')
         data = []
 
         codes = self._get_codes()
