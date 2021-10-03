@@ -1,0 +1,34 @@
+{
+    "schemaName": "dates",
+    "tableName": "stocks",
+    "key": {
+        "dataFormat": "raw",
+        "fields": [
+            {
+                "name": "redis_key",
+                "type": "varchar",
+                "hidden": "true"
+            }
+        ]
+    },
+    "value": {
+        "dataFormat": "hash",
+        "fields": [
+            {
+                "name": "key",
+                "type": "varchar",
+                "mapping": "key"
+            },
+            {
+                "name": "date",
+                "type": "varchar",
+                "mapping": "date"
+            },
+            {
+                "name": "open",
+                "type": "boolean",
+                "mapping": "open"
+            }
+        ]
+    }
+}
