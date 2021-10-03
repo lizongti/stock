@@ -110,22 +110,20 @@ class TurnController(presto.DataSource):
     def _calc_by_date(self: object, code: str, date: str, df: DataFrame) -> list[str]:
         turn = {}
         for delta in range(1, 10):
-            if delta not in turn:
-                turn[delta] = 0
-            for index in range(df.shape[0]-1, -1, -1):
+            turn[delta] = 0
+        for delta in range(1, 10):
+            for index in range(df.shape[0]-1, delta-1, -1):
                 if df.shape[0] <= delta:
                     turn[delta] = 0
                 elif df.iloc[index]['close'] > df.iloc[index-delta]['close']:
                     if turn[delta] >= 0:
                         turn[delta] = turn[delta] + 1
                     else:
-                        turn[delta] = 1
                         break
                 elif df.iloc[index]['close'] < df.iloc[index-delta]['close']:
                     if turn[delta] <= 0:
                         turn[delta] = turn[delta] - 1
                     else:
-                        turn[delta] = -1
                         break
                 else:
                     if turn[delta] > 0:
@@ -160,7 +158,9 @@ class TurnController(presto.DataSource):
             select *, row_number() over (partition by code order by date desc)  as n from postgresql.stock.days
             ) where n <= %d and date <= '%s'
         """ % (TurnController._limit, date)
-        return presto.select(DaysController(), sql)
+        df = presto.select(DaysController(), sql)
+        df = df.reindex(index=df.index[::-1])
+        return df
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
@@ -172,5 +172,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnController().run(sys.argv[1])
     else:
-        TurnController().run(start_date='1990-12-19', end_date='2021-09-29')
-        # TurnController().run(-1)
+        #TurnController().run(start_date='1990-12-19', end_date='2021-09-29')
+        TurnController().run(-3)

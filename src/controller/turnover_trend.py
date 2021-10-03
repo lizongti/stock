@@ -104,18 +104,16 @@ class TurnoverTrendController(presto.DataSource):
 
     def _calc_by_date(self: object, code: str, date: str, df: DataFrame) -> list[str]:
         trend = 0
-        for index in range(df.shape[0]-2, -1, -1):
-            if df.iloc[index]['close'] > df.iloc[index-1]['close']:
+        for index in range(df.shape[0]-1, 0, -1):
+            if df.iloc[index]['turnover'] > df.iloc[index-1]['turnover']:
                 if trend >= 0:
                     trend = trend + 1
                 else:
-                    trend = 1
                     break
-            elif df.iloc[index]['close'] < df.iloc[index-1]['close']:
+            elif df.iloc[index]['turnover'] < df.iloc[index-1]['turnover']:
                 if trend <= 0:
                     trend = trend - 1
                 else:
-                    trend = -1
                     break
             else:
                 if trend > 0:
@@ -149,7 +147,9 @@ class TurnoverTrendController(presto.DataSource):
             select *, row_number() over (partition by code order by date desc)  as n from postgresql.stock.days
             ) where n <= %d and date <= '%s'
         """ % (TurnoverTrendController._limit, date)
-        return presto.select(DaysController(), sql)
+        df = presto.select(DaysController(), sql)
+        df = df.reindex(index=df.index[::-1])
+        return df
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
@@ -162,4 +162,4 @@ if __name__ == '__main__':
         TurnoverTrendController().run(sys.argv[1])
     else:
         #TurnoverTrendController().run(start_date='1990-12-19', end_date='2021-09-29')
-        TurnoverTrendController().run()
+        TurnoverTrendController().run(-3)
