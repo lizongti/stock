@@ -29,7 +29,7 @@ def _level0(date):
 
 
 def _level1(date: str):
-    TurnoverRateController().run(date)
+    RelativeVolumeController().run(date)
     TurnoverTrendController().run(date)
     MovingAverageController().run(date)
     TurnController().run(date)

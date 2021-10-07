@@ -10,16 +10,16 @@ from tools import time
 from retrying import retry
 
 
-class TurnoverRateController(presto.DataSource):
+class RelativeVolumeController(presto.DataSource):
     _catalog = 'postgresql'
     _schema = 'stock'
-    _table = 'turnover_rate'
+    _table = 'relative_volume'
 
     def __init__(self: object):
-        super(TurnoverRateController, self).__init__(
-            TurnoverRateController._catalog,
-            TurnoverRateController._schema,
-            TurnoverRateController._table,
+        super(RelativeVolumeController, self).__init__(
+            RelativeVolumeController._catalog,
+            RelativeVolumeController._schema,
+            RelativeVolumeController._table,
         )
 
     def run(self: object, days: object = 0, **kargs):
@@ -71,7 +71,7 @@ class TurnoverRateController(presto.DataSource):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        TurnoverRateController().run(sys.argv[1])
+        RelativeVolumeController().run(sys.argv[1])
     else:
-        #TurnoverRateController().run(start_date='2004-01-01', end_date='2021-09-29')
-        TurnoverRateController().run()
+        #RelativeVolumeController().run(start_date='2004-01-01', end_date='2021-09-29')
+        RelativeVolumeController().run()

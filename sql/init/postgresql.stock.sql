@@ -40,14 +40,14 @@ create table if not exists stock.turnover_trend(
 );
 create index if not exists turnover_trend_index_code on stock.turnover_trend (code);
 create index if not exists turnover_trend_index_date on stock.turnover_trend (date);
-create table if not exists stock.turnover_rate(
-  rate double precision,
+create table if not exists stock.relative_volume(
+  rvol double precision,
   date varchar,
   code varchar,
-  constraint turnover_rate_primary_key_code_date primary key (code, date)
+  constraint relative_volume_primary_key_code_date primary key (code, date)
 );
-create index if not exists turnover_rate_index_code on stock.turnover_rate (code);
-create index if not exists turnover_rate_index_date on stock.turnover_rate (date);
+create index if not exists relative_volume_index_code on stock.relative_volume (code);
+create index if not exists relative_volume_index_date on stock.relative_volume (date);
 create table if not exists stock.moving_average(
   ma5 double precision,
   ma10 double precision,
