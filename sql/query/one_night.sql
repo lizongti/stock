@@ -1,7 +1,7 @@
-set session query_max_stage_count = 150;
+set session query_max_stage_count = 1000;
 with codes as (
     with dates as (
-        select date, n from (select date, row_number() over (order by date desc) as n from dates where date >= '2021-09-01' and open = '1')  where n <= 4 
+        select date, n from (select date, row_number() over (order by date asc) as n from dates where date >= '2021-09-03' and open = '1')  where n <= 4 
     )
     select distinct rule1.code as code from 
     (
@@ -18,25 +18,44 @@ with codes as (
     ) rule4,
     (
         select code from postgresql.stock.turnover_trend where date in (select date from dates where n = 1)  and trend >= 2
-    ) rule5
+    ) rule5,
+    (
+        select code from postgresql.stock.days where date in (select date from dates where n = 1) and (high - close) / open < 0.5
+    ) rule6,
+    (
+        select ma.code from
+        (select code, ma5 from postgresql.stock.moving_average where date in (select date from dates where n = 1)) ma,
+        (select code, close from postgresql.stock.days where date in (select date from dates where n = 1)) days
+        where ma.code = days.code and days.close > ma.ma5
+    ) rule7
     where rule1.code = rule2.code
     and rule1.code = rule3.code
     and rule1.code = rule4.code
     and rule1.code = rule5.code
+    and rule1.code = rule6.code
+    and rule1.code = rule7.code
 ),
 dates as (
-    select date, n from (select date, row_number() over (order by date desc) as n from dates where date >= '2021-09-01' and open = '1')  where n <= 4 
+    select date, n from (select date, row_number() over (order by date asc) as n from dates where date >= '2021-09-03' and open = '1')  where n <= 4 
 )
 select 
     status.code, 
+    status.date,
+    status.close,
+    result1.date,
+    result1.high,
+    result2.date,
+    result2.high,
+    result3.date,
+    result3.high,
     (result1.high - status.close) * 100/status.close as day1, 
     (result2.high - status.close) * 100/status.close as day2,
     (result3.high - status.close) * 100/status.close as day3
 from
-    (select close, code from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 1) ) status,
-    (select high, code from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 2) ) result1,
-    (select high, code from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 3) ) result2,
-    (select high, code from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 4) ) result3
+    (select close, code, date from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 1) ) status,
+    (select high, code, date from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 2) ) result1,
+    (select high, code, date from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 3) ) result2,
+    (select high, code,date from postgresql.stock.days where code in (select code from codes) and date in (select date from dates where n = 4) ) result3
 where result1.code = status.code
 and result2.code = status.code
 and result3.code = status.code
