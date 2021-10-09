@@ -53,6 +53,7 @@ class MinutesController(presto.DataSource):
 
     def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
+        presto.delete(MinutesPartitialController(), {'date': date})
 
     def _select_by_date(self: object, date: str) -> DataFrame:
         return presto.select(MinutesPartitialController(), {'date': date})
