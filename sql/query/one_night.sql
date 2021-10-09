@@ -1,6 +1,6 @@
 with codes as (
     with dates as (
-        select date, n from (select date, row_number() over (order by date asc) as n from dates where date >= '2021-09-03' and open = '1')  where n <= 4 
+        select date, n from (select date, row_number() over (order by date asc) as n from redis.stock.dates where date >= '2021-09-03' and open = '1')  where n <= 4 
     )
     select distinct rule1.code as code from 
     (
@@ -20,22 +20,15 @@ with codes as (
     ) rule5,
     (
         select code from postgresql.stock.days where date in (select date from dates where n = 1) and (high - close) / open <= 0.5
-    ) rule6,
-    (
-        select ma.code from
-        (select code, ma5 from postgresql.stock.moving_average where date in (select date from dates where n = 1)) ma,
-        (select code, close from postgresql.stock.days where date in (select date from dates where n = 1)) days
-        where ma.code = days.code and days.close > ma.ma5
-    ) rule7
+    ) rule6
     where rule1.code = rule2.code
     and rule1.code = rule3.code
     and rule1.code = rule4.code
     and rule1.code = rule5.code
     and rule1.code = rule6.code
-    and rule1.code = rule7.code
 ),
 dates as (
-    select date, n from (select date, row_number() over (order by date asc) as n from dates where date >= '2021-09-03' and open = '1')  where n <= 4 
+    select date, n from (select date, row_number() over (order by date asc) as n from redis.stock.dates where date >= '2021-09-03' and open = '1')  where n <= 4 
 )
 select 
     status.code, 

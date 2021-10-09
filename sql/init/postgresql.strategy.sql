@@ -11,7 +11,18 @@ create table if not exists strategy.one_night(
   day3_date varchar,
   day3_high double precision,
   day3_rate double precision,
+  change_rate_min double precision,
+  change_rate_max double precision,
+  rvol_min double precision,
+  rvol_max double precision,
+  turnover_rate_min double precision,
+  turnover_rate_max double precision,
+  total_mv_min double precision,
+  total_mv_max double precision,
+  trend_min double precision,
+  trend_max double precision,
+  fall_min double precision,
+  fall_max double precision,
   date varchar,
-  code varchar,
-  constraint indicator_primary_key_code_date primary key (code, date)
+  code varchar
 )

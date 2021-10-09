@@ -79,6 +79,9 @@ class MinutesPartitialController(presto.DataSource):
         from controller import StocksController
         return StocksController().get()
 
+    def delete_by_date(self: object, date: str):
+        presto.delete(self, {'date': date})
+
 
 class MinutesController(presto.DataSource):
     _catalog = 'hive'
@@ -117,18 +120,17 @@ class MinutesController(presto.DataSource):
     def _update_by_date(self: object, date: str):
         print('.', end='')
         self._delete_by_date(date)
-        df = self._select_by_date(date)
-        self._insert(df)
+        self._insert_by_date(date)
+        MinutesPartitialController().delete_by_date(date)
 
     def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
-        presto.delete(MinutesPartitialController(), {'date': date})
 
-    def _select_by_date(self: object, date: str) -> DataFrame:
-        return presto.select(MinutesPartitialController(), {'date': date})
-
-    def _insert(self: object, df: DataFrame):
-        presto.insert(self, df)
+    def _insert_by_date(self: object, date: str) -> DataFrame:
+        sql = """
+            insert into hive.stock.minutes select * from hive.stock.minutes_partitial where date='%s'
+        """ % (date)
+        presto.insert(self, sql)
 
 
 if __name__ == '__main__':
