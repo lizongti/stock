@@ -1,6 +1,6 @@
 
 create schema if not exists strategy;
-create table if not exists strategy.one_night_strategy(
+create table if not exists strategy.one_night(
   quote_change int,
   quantity_ratio int,
   turnover_rate int,
