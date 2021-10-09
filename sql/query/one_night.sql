@@ -1,4 +1,3 @@
-set session query_max_stage_count = 1000;
 with codes as (
     with dates as (
         select date, n from (select date, row_number() over (order by date asc) as n from dates where date >= '2021-09-03' and open = '1')  where n <= 4 

@@ -90,4 +90,4 @@ if __name__ == '__main__':
         IndicatorController().run(sys.argv[1])
     else:
         # IndicatorController().run(start_date='1990-12-19', end_date='2021-09-30')
-        IndicatorController().run()
+        IndicatorController().run(-1)
