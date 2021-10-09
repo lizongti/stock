@@ -64,9 +64,9 @@ class MinutesPartitialController(presto.DataSource):
         df = akshare.stock_zh_a_hist_min_em(symbol=code)
         df.columns = MinutesPartitialController._rename_columns
 
-        df['code'] = df.apply(lambda x: code, axis=1)
         df['time'] = df.apply(lambda x: x['datetime'].split(' ')[1], axis=1)
         df['date'] = df.apply(lambda x: x['datetime'].split(' ')[0], axis=1)
+        df['code'] = df.apply(lambda x: code, axis=1)
         df.pop('last')
         df.pop('datetime')
 
@@ -82,4 +82,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         MinutesPartitialController().run(sys.argv[1])
     else:
-        MinutesPartitialController().run()
+        MinutesPartitialController().run(-1)
