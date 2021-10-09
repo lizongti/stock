@@ -29,6 +29,18 @@ class HiveConnector(Connector):
                index=False, index_label=None, chunksize=None,
                dtype=None, method='multi')
 
+    def _insert_sql(self: object, schema: str, sql: str):
+        from sqlalchemy.engine import create_engine
+        from pandas.io.sql import execute
+
+        engine = create_engine(
+            'presto://%s:%d/hive/%s' %
+            (HiveConnector._presto['host'],
+             HiveConnector._presto['port'],
+             schema))
+
+        execute(sql, engine)
+
     def _delete_list(self: object, schema: str, table: str, conditions: list[str]):
         from sqlalchemy import MetaData, Table, delete
         from sqlalchemy.sql.expression import text

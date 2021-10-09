@@ -14,6 +14,10 @@ class Connector(object):
         pass
 
     @abstractmethod
+    def _insert_sql(self: object, schema: str,  sql: str):
+        pass
+
+    @abstractmethod
     def _delete_list(self: object, schema: str, table: str,  conditions: list[str]):
         pass
 
@@ -22,7 +26,7 @@ class Connector(object):
         pass
 
     @abstractmethod
-    def _select_list(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
+    def _select_list(self: object, schema: str, table: str, conditions: list[str]) -> DataFrame:
         pass
 
     @abstractmethod
@@ -30,12 +34,14 @@ class Connector(object):
         pass
 
     @abstractmethod
-    def _select_sql(self: object, schema: str, table: str, conditions: dict[str, str]) -> DataFrame:
+    def _select_sql(self: object, schema: str, sql: str) -> DataFrame:
         pass
 
     def insert(self: object, schema: str, table: str, data: object):
         if isinstance(data, DataFrame):
             self._insert_df(schema, table, data)
+        elif isinstance(data, str):
+            return self._insert_sql(schema, data)
         else:
             self._default(schema, table, data)
 

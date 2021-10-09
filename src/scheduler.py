@@ -24,7 +24,7 @@ def _run(date):
 def _level0(date):
     StocksController().run()
     DaysController().run(date)
-    MinutesController().run(date)
+    MinutesPartitialController().run(date)
     IndicatorController().run(date)
 
 

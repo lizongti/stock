@@ -99,8 +99,8 @@ class MinutesIndicatorController(presto.DataSource):
         presto.insert(self, df)
 
     def _get_minutes_by_code_date(self: object, code: str, date: str) -> DataFrame:
-        from controller import MinutesController
-        return presto.select(MinutesController(), {'code': code, 'date': date})
+        from controller import MinutesPartitialController
+        return presto.select(MinutesPartitialController(), {'code': code, 'date': date})
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
