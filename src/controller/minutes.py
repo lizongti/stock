@@ -48,8 +48,8 @@ class MinutesController(presto.DataSource):
     def _update_by_date(self: object, date: str):
         print('.', end='')
         self._delete_by_date(date)
-        df = self.select_by_date(date)
-        self.insert(df)
+        df = self._select_by_date(date)
+        self._insert(df)
 
     def _delete_by_date(self: object, date: str):
         presto.delete(self, {'date': date})
