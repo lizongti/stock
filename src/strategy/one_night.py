@@ -39,6 +39,7 @@ class OneNightStrategy(presto.DataSource):
         print('.', end='')
         args = [3, 5, 1, 3, 5, 10, 5, 20, 2, 3, 0, 0.5]
         sql = """
+            insert into postgresql.strategy.one_night 
             with codes as (
                 with dates as (
                     select date, n from (select date, row_number() over (order by date asc) as n from redis.stock.dates where date >= '%s' and open = '1')  where n <= 4 
@@ -71,7 +72,7 @@ class OneNightStrategy(presto.DataSource):
             dates as (
                 select date, n from (select date, row_number() over (order by date asc) as n from redis.stock.dates where date >= '2021-09-03' and open = '1')  where n <= 4 
             )
-            insert into postgresql.strategy.one_night select 
+            select 
                 status.close,
                 result1.date as day1_date,
                 result1.high as day1_high,
