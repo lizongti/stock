@@ -16,7 +16,7 @@ class OneNightStrategy(presto.DataSource):
 
     def run(self: object):
 
-    def _select(self: object) -> DataFrame:
+    def _execute(self: object, date: str) -> DataFrame:
         sql = """
             set session query_max_stage_count = 1000;
             select 
