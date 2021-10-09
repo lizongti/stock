@@ -8,7 +8,7 @@ with codes as (
         select code from postgresql.stock.days where date in (select date from dates where n = 1) and change_rate>=3 and change_rate<=5
     ) rule1,
     (
-        select code from postgresql.stock.relative_volume where date in (select date from dates where n = 1)  and rvol > 1
+        select code from postgresql.stock.relative_volume where date in (select date from dates where n = 1)  and rvol >= 1
     ) rule2,
     (
         select code from postgresql.stock.days where date in (select date from dates where n = 1)  and turnover_rate >= 5 and turnover_rate <=10
@@ -17,10 +17,10 @@ with codes as (
         select code from postgresql.stock.indicator where date in (select date from dates where n = 1)  and total_mv >= 5000000000 and total_mv <= 20000000000
     ) rule4,
     (
-        select code from postgresql.stock.turnover_trend where date in (select date from dates where n = 1)  and trend >= 2
+        select code from postgresql.stock.turnover_trend where date in (select date from dates where n = 1)  and trend >= 2 and trend <= 3
     ) rule5,
     (
-        select code from postgresql.stock.days where date in (select date from dates where n = 1) and (high - close) / open < 0.5
+        select code from postgresql.stock.days where date in (select date from dates where n = 1) and (high - close) / open <= 0.5
     ) rule6,
     (
         select ma.code from
