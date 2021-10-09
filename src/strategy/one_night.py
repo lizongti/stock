@@ -70,7 +70,7 @@ class OneNightStrategy(presto.DataSource):
                 and rule1.code = rule6.code
             ),
             dates as (
-                select date, n from (select date, row_number() over (order by date asc) as n from redis.stock.dates where date >= '2021-09-03' and open = '1')  where n <= 4 
+                select date, n from (select date, row_number() over (order by date asc) as n from redis.stock.dates where date >= '%s' and open = '1')  where n <= 4 
             )
             select 
                 status.close,
@@ -105,9 +105,8 @@ class OneNightStrategy(presto.DataSource):
             where result1.code = status.code
             and result2.code = status.code
             and result3.code = status.code
-        """ % (date,
-               args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11],
-               args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11])
+        """ % (date, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11],
+               date, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11])
         presto.delete(self, {'date': date})
         presto.insert(self, sql)
 
