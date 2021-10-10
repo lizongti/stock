@@ -86,4 +86,6 @@ if __name__ == '__main__':
         DatesController().run(sys.argv[1])
     else:
         # DatesController().run(start_date='1990-12-19', end_date='2021-10-02')
-        DatesController().run()
+        # DatesController().run()
+        print(DatesController().is_open("1990-12-19"))
+        # need fix

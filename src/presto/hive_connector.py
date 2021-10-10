@@ -31,7 +31,7 @@ class HiveConnector(Connector):
 
     def _insert_sql(self: object, schema: str, sql: str):
         from sqlalchemy.engine import create_engine
-        from pandas.io.sql import execute
+        from pandas.io.sql import read_sql
 
         engine = create_engine(
             'presto://%s:%d/hive/%s' %
@@ -39,7 +39,7 @@ class HiveConnector(Connector):
              HiveConnector._presto['port'],
              schema))
 
-        execute(sql, engine)
+        read_sql(sql, engine)
 
     def _delete_list(self: object, schema: str, table: str, conditions: list[str]):
         from sqlalchemy import MetaData, Table, delete
