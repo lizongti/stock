@@ -56,7 +56,7 @@ class RelativeVolumeController(presto.DataSource):
 
     def _select_by_date(self: object, date: str) -> DataFrame:
         sql = """
-            select day.code, day.date, (case average.turnover when 0 then 1 else day.turnover/average.turnover end) as rate from
+            select day.code, day.date, (case average.turnover when 0 then 1 else day.turnover/average.turnover end) as rvol from
             (select code, avg(turnover) as turnover from
             (select code, turnover, row_number() over(partition by code order by date desc) as n from postgresql.stock.days where date <= '%s')
             where n >= 2 and n <= 6
@@ -74,4 +74,4 @@ if __name__ == '__main__':
         RelativeVolumeController().run(sys.argv[1])
     else:
         #RelativeVolumeController().run(start_date='2004-01-01', end_date='2021-09-29')
-        RelativeVolumeController().run()
+        RelativeVolumeController().run(-2)

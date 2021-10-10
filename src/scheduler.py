@@ -1,4 +1,5 @@
 import sys
+from controller.minutes_partitial import MinutesPartitialController
 from tools import time
 from apscheduler.schedulers.blocking import BlockingScheduler
 from controller import *
@@ -17,13 +18,14 @@ def _run(date):
     if not DatesController().is_open(date):
         return
 
-    _level0(date)
+    # _level0(date)
     _level1(date)
 
 
 def _level0(date):
     StocksController().run()
     DaysController().run(date)
+    MinutesPartitialController.run(date)
     MinutesController().run(date)
     IndicatorController().run(date)
 

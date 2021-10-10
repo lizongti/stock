@@ -41,7 +41,8 @@ class DatesController(presto.DataSource):
             self._update_by_date(date)
             print(' -> Done!')
 
-    def is_open(self: object, date: str) -> bool:
+    def is_open(self: object, days: str) -> bool:
+        date = time.date(days)
         return presto.select(self, {'key': date}).iloc[0]['open'] == "1"
 
     @retry(stop_max_attempt_number=100)
