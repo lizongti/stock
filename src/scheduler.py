@@ -18,7 +18,7 @@ def _run(date):
     if not DatesController().is_open(date):
         return
 
-    # _level0(date)
+    _level0(date)
     _level1(date)
 
 
