@@ -22,9 +22,9 @@ def _run(date):
 
 
 def _level0(date):
-    StocksController().run()
-    DaysController().run(date)
-    MinutesPartitialController.run(date)
+    # StocksController().run()
+    # DaysController().run(date)
+    MinutesPartitialController().run(date)
     MinutesController().run(date)
     IndicatorController().run(date)
 

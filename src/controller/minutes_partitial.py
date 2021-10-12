@@ -78,9 +78,6 @@ class MinutesPartitialController(presto.DataSource):
         from controller import StocksController
         return StocksController().get()
 
-    def delete_by_date(self: object, date: str):
-        presto.delete(self, {'date': date})
-
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
