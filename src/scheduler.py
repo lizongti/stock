@@ -1,5 +1,4 @@
 import sys
-from controller.minutes_partitial import MinutesPartitialController
 from tools import time
 from apscheduler.schedulers.blocking import BlockingScheduler
 from controller import *

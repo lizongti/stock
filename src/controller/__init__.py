@@ -1,6 +1,7 @@
 from .dates import DatesController
 from .stocks import StocksController
 from .days import DaysController
+from .minutes_partitial import MinutesPartitialController
 from .minutes import MinutesController
 from .indicator import IndicatorController
 from .relative_volume import RelativeVolumeController
