@@ -41,5 +41,5 @@ if __name__ == "__main__":
         _run(sys.argv[1])
     else:
         print("[%s][scheduler] start!" % (time.clock()))
-        _scheduler.add_job(_daily, 'cron', hour=21, minute=30)
+        _scheduler.add_job(_daily, 'cron', hour=10, minute=30)
         _scheduler.start()
