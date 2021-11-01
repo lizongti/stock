@@ -13,7 +13,7 @@ def _daily():
 
 
 def _run(date):
-    DatesController().run()
+    DatesController().run(date)
     if not DatesController().is_open(date):
         return
 
@@ -29,7 +29,7 @@ def _level0(date):
     IndicatorController().run(date)
 
 
-def _level1(date: str):
+def _level1(date):
     RelativeVolumeController().run(date)
     TurnoverTrendController().run(date)
     MovingAverageController().run(date)
@@ -41,5 +41,5 @@ if __name__ == "__main__":
         _run(sys.argv[1])
     else:
         print("[%s][scheduler] start!" % (time.clock()))
-        _scheduler.add_job(_daily, 'cron', hour=10, minute=30)
+        _scheduler.add_job(_daily, 'cron', hour=15, minute=30)
         _scheduler.start()
