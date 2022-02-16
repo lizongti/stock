@@ -4,7 +4,7 @@ if __name__ == '__main__':
     sys.path.append(dirname(dirname(abspath(__file__))))
 
 import datetime
-from pandas.core.frame import DataFrame
+from pandas import DataFrame
 import presto
 from tools import time
 from retrying import retry
@@ -14,7 +14,7 @@ class MinutesIndicatorController(presto.DataSource):
     _catalog = 'hive'
     _schema = 'stock'
     _table = 'minutes_indicator'
-    _columns = ['price', 'higheast', 'loweast', 'average',
+    _columns = ['price', 'high', 'low', 'average',
                 'state', 'ratio', 'time', 'date', 'code']
 
     def __init__(self: object):
@@ -62,19 +62,19 @@ class MinutesIndicatorController(presto.DataSource):
     def _calc_by_code_date(self: object, code: str, date: str, df: DataFrame) -> list[list]:
         data = []
         sum = 0
-        higheast = None
-        loweast = None
+        high = None
+        low = None
 
         for index in range(0, df.shape[0]):
-            price = df.iloc[index]['closing']
-            if higheast is None:
-                higheast = price
-            elif higheast < price:
-                higheast = price
-            if loweast is None:
-                loweast = price
-            elif loweast > price:
-                loweast = price
+            price = df.iloc[index]['close']
+            if high is None:
+                high = price
+            elif high < price:
+                high = price
+            if low is None:
+                low = price
+            elif low > price:
+                low = price
             sum += price
             avg = sum/(index+1)
             if price > avg:
@@ -83,11 +83,11 @@ class MinutesIndicatorController(presto.DataSource):
                 state = -1
             else:
                 state = 0
-            ratio = (df.iloc[index]['closing'] /
-                     df.iloc[0]['closing'] - 1) * 100
+            ratio = (df.iloc[index]['close'] /
+                     df.iloc[0]['close'] - 1) * 100
 
             data.append(
-                [price, higheast, loweast, avg, state, ratio, df.iloc[index]['time'], date, code])
+                [price, high, low, avg, state, ratio, df.iloc[index]['time'], date, code])
         return data
 
     @retry(stop_max_attempt_number=100)
@@ -99,13 +99,13 @@ class MinutesIndicatorController(presto.DataSource):
         presto.insert(self, df)
 
     def _get_minutes_by_code_date(self: object, code: str, date: str) -> DataFrame:
-        from controller import MinutesController
-        return presto.select(MinutesController(), {'code': code, 'date': date})
+        from controller import MinutesPartitialController
+        return presto.select(MinutesPartitialController(), {'code': code, 'date': date})
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
-        return presto.select(StocksController())['code'].to_list()
+        return StocksController().get()
 
 
 if __name__ == '__main__':
@@ -113,4 +113,17 @@ if __name__ == '__main__':
         MinutesIndicatorController().run(sys.argv[1])
     else:
         #MinutesIndicatorController().run(start_date='2021-09-09', end_date='2021-09-29')
-        MinutesIndicatorController().run(-1)
+        MinutesIndicatorController().run()
+
+
+create table if not exists hive.stock.minutes_indicator(
+    price double,
+    high double,
+    low double,
+    average double,
+    state int,
+    ratio double,
+    time varchar,
+    date varchar,
+    code varchar
+) with (partitioned_by=array['date', 'code'])

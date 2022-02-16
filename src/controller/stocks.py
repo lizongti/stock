@@ -7,7 +7,6 @@ if __name__ == '__main__':
 import akshare
 import presto
 from retrying import retry
-from pandas import DataFrame
 from tools import time
 
 
@@ -34,6 +33,9 @@ class StocksController(presto.DataSource):
         df = akshare.stock_info_a_code_name()
         df['key'] = df.apply(lambda x: x.code, axis=1)
         presto.insert(self, df)
+
+    def get(self: object) -> list[str]:
+        return presto.select(self)['code'].to_list()
 
 
 if __name__ == '__main__':

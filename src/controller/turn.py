@@ -4,7 +4,7 @@ if __name__ == '__main__':
     from os.path import dirname, abspath
     sys.path.append(dirname(dirname(abspath(__file__))))
 
-from pandas.core.frame import DataFrame
+from pandas import DataFrame
 import presto
 from tools import time
 from retrying import retry
@@ -60,7 +60,9 @@ class TurnController(presto.DataSource):
         print('.', end='')
         self._delete_by_date(date)
         df = self._get_days_by_date(date)
-        df.sort_values('date', ascending=False)
+        if df.shape[0] == 0:
+            return
+        df.sort_values('date')
         data = []
 
         codes = self._get_codes()
@@ -71,8 +73,7 @@ class TurnController(presto.DataSource):
                 code, date, df.query('code=="%s"' % (code)))
             data.append(list)
 
-        df = DataFrame(data=data, columns=TurnController._columns)
-        presto.insert(self, df)
+        self._insert(data)
 
     def _calc_by_dates(self: object, code: str, start_date: str, end_date: str, df: DataFrame):
         data = []
@@ -81,12 +82,12 @@ class TurnController(presto.DataSource):
             for delta in range(1, 10):
                 if index < delta:
                     turn[delta] = 0
-                elif df.iloc[index]['closing'] > df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] > df.iloc[index-delta]['close']:
                     if turn[delta] >= 0:
                         turn[delta] = turn[delta] + 1
                     else:
                         turn[delta] = 1
-                elif df.iloc[index]['closing'] < df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] < df.iloc[index-delta]['close']:
                     if turn[delta] <= 0:
                         turn[delta] = turn[delta] - 1
                     else:
@@ -100,7 +101,7 @@ class TurnController(presto.DataSource):
                         turn[delta] = 0
 
             date = df.iloc[index]['date']
-            if date >= start_date and date <= end_date:
+            if df.query('date=="%s"' % (date)).shape[0] > 0 and date >= start_date and date <= end_date:
                 data.append([turn[1], turn[2], turn[3], turn[4], turn[5],
                              turn[6], turn[7], turn[8], turn[9], date, code])
 
@@ -109,22 +110,20 @@ class TurnController(presto.DataSource):
     def _calc_by_date(self: object, code: str, date: str, df: DataFrame) -> list[str]:
         turn = {}
         for delta in range(1, 10):
-            if delta not in turn:
-                turn[delta] = 0
-            for index in range(df.shape[0]-1, -1, -1):
+            turn[delta] = 0
+        for delta in range(1, 10):
+            for index in range(df.shape[0]-1, delta-1, -1):
                 if df.shape[0] <= delta:
                     turn[delta] = 0
-                elif df.iloc[index]['closing'] > df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] > df.iloc[index-delta]['close']:
                     if turn[delta] >= 0:
                         turn[delta] = turn[delta] + 1
                     else:
-                        turn[delta] = 1
                         break
-                elif df.iloc[index]['closing'] < df.iloc[index-delta]['closing']:
+                elif df.iloc[index]['close'] < df.iloc[index-delta]['close']:
                     if turn[delta] <= 0:
                         turn[delta] = turn[delta] - 1
                     else:
-                        turn[delta] = -1
                         break
                 else:
                     if turn[delta] > 0:
@@ -159,17 +158,19 @@ class TurnController(presto.DataSource):
             select *, row_number() over (partition by code order by date desc)  as n from postgresql.stock.days
             ) where n <= %d and date <= '%s'
         """ % (TurnController._limit, date)
-        return presto.select(DaysController(), sql)
+        df = presto.select(DaysController(), sql)
+        df = df.reindex(index=df.index[::-1])
+        return df
 
     @retry(stop_max_attempt_number=100)
     def _get_codes(self: object) -> list[str]:
         from controller import StocksController
-        return presto.select(StocksController())['code'].to_list()
+        return StocksController().get()
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         TurnController().run(sys.argv[1])
     else:
-        TurnController().run(start_date='1990-12-19', end_date='2021-09-29')
-        # TurnController().run(-1)
+        #TurnController().run(start_date='1990-12-19', end_date='2021-09-29')
+        TurnController().run(-3)
