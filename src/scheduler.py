@@ -42,3 +42,7 @@ if __name__ == "__main__":
         print("[%s][scheduler] start!" % (time.clock()))
         _scheduler.add_job(_daily, 'cron', hour=15, minute=30)
         _scheduler.start()
+
+
+
+
